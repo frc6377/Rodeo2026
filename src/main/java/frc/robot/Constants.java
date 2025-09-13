@@ -13,7 +13,13 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+
+import com.ctre.phoenix6.signals.GravityTypeValue;
+
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.RobotBase;
+import frc.robot.util.HowdyPID;
 
 /**
  * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running on a roboRIO. Change
@@ -37,11 +43,37 @@ public final class Constants {
     }
 
     public final class MotorIDs {
-        public static final int leftDriveMotor1 = 1;
-        public static final int leftDriveMotor2 = 2;
-        public static final int rightDriveMotor1 = 3;
-        public static final int rightDriveMotor2 = 4;
+        public static final int leftDriveLeader = 1;
+        public static final int leftDriveFollower = 2;
+        public static final int rightDriveLeader = 3;
+        public static final int rightDriveFollower = 4;
 
         public static final int pigeonID = 5;
+        
+        public static final int salvagePivotMotor = 6;
+        public static final int salvageIntakeMotor = 7;
+    }
+    public final class SensorIDs {
+        public static final int salvagePivotEncoder = 0; // TODO: FIXIT
+
+    }
+    public static class salvageConstants {
+        //PID
+        public static final double salvagePivotP = 1.0; // TODO: FIXIT
+        public static final double salvagePivotI = 0.0;
+        public static final double salvagePivotD = 0.0;
+        //Angles
+        public static final Angle SalvagePivotMinAngle = Degrees.of(0); // TODO: FIXIT
+        public static final Angle SalvagePivotMaxAngle = Degrees.of(0); // degrees
+        public static final Angle SalvagePivotTolerance = Degrees.of(2); // degrees
+        public static final Angle SalvagePivotInitialAngle = Degrees.of(0); // degrees
+        public static final Angle SalvagePivotPickupAngle = Degrees.of(0); // degrees
+        public static final Angle SalvagePivotStowAngle = Degrees.of(0); // degrees
+        public static final Angle SalvagePivotScoreAngle = Degrees.of(0); // degrees
+        public static final Angle SalvagePivotUpAngle = Degrees.of(0); // degrees
+        //Speeds
+        public static final double IntakeMotorSpeed = 0.7;
+        public static final double OuttakeMotorSpeed = -0.7;
+        
     }
 }
