@@ -55,4 +55,9 @@ public class OIKeyboard implements OI {
     public DoubleSupplier driveRotation() {
         return RightX;
     }
+
+    @Override
+    public Trigger zeroDrivebase() {
+        return noButton;
+    }
 }

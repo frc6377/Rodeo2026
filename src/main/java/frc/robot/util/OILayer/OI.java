@@ -25,20 +25,4 @@ public interface OI {
     default Trigger zeroDrivebase() {
         return noButton;
     }
-
-    default Trigger button1() {
-        return noButton;
-    }
-
-    default Trigger button2() {
-        return noButton;
-    }
-
-    default Trigger button3() {
-        return noButton;
-    }
-
-    default Trigger button4() {
-        return noButton;
-    }
 }
