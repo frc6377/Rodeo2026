@@ -15,9 +15,9 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Drive.Drive;
@@ -61,8 +61,8 @@ public class RobotContainer {
                 break;
         }
 
-        // Set up auto routines
-        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+        // Set up auto routines (Not AutoBuilder.buildAutoChooser() - Tank Don't Have Odometry)
+        autoChooser = new LoggedDashboardChooser<>("Auto Choices", new SendableChooser<Command>());
 
         // Set up SysId routines
         autoChooser.addOption("Example Auto", Commands.none());
@@ -78,7 +78,7 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         // Default command, normal field-relative drive
-        drive.setDefaultCommand(Commands.none());
+        drive.setDefaultCommand(drive.driveCommand(controller.driveTranslationY(), controller.driveRotation()));
 
         // Reset gyro / odometry
         final Runnable resetGyro = () -> {};
