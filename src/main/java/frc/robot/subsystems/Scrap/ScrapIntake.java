@@ -9,7 +9,7 @@ public class ScrapIntake {
 
     public ScrapIntake() {
         intakeMotor = new TalonSRX(10); // Example ID
-        pivotMotor = new TalonSRX(11);  // Example ID
+        pivotMotor = new TalonSRX(11); // Example ID
     }
 
     public void goToPivotPosition(double position) {
