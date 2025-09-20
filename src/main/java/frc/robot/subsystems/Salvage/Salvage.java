@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.salvageConstants;
+import frc.robot.Robot;
 
 public class Salvage extends SubsystemBase {
     /** Creates a new salvage. */
@@ -33,16 +34,21 @@ public class Salvage extends SubsystemBase {
         salvageIntakeMotor = new TalonSRX(Constants.MotorIDs.salvageIntakeMotor);
         salvageIntakeMotor.setInverted(false);
         salvagePivotEncoder = new DutyCycleEncoder(Constants.SensorIDs.salvagePivotEncoder);
-        salvagePivotPID =  new PIDController(
-            salvageConstants.salvagePivotP, salvageConstants.salvagePivotI, salvageConstants.salvagePivotD);
+        salvagePivotPID = new PIDController(
+                salvageConstants.salvagePivotP, salvageConstants.salvagePivotI, salvageConstants.salvagePivotD);
         salvagePivotPID.setTolerance(salvageConstants.SalvagePivotTolerance.in(Degrees));
-
     }
 
     public Command update() {
-        return Commands.none();
+        return run(() -> {
+            if (Math.abs(salvagePivotPID.getSetpoint() - getCurrentAngle().in(Degrees))
+                    > 180) { // Make sure the pivot does not go through the robot
+                salvagePivotPID.setSetpoint(salvageConstants.SalvagePivotUpAngle.in(Degrees));
+            }
+            double output = salvagePivotPID.calculate(getCurrentAngle().in(Degrees));
+            salvagePivotMotor.set(ControlMode.PercentOutput, output);
+        });
     }
-
 
     // TODO make a stop command
 
@@ -51,48 +57,60 @@ public class Salvage extends SubsystemBase {
     // TODO make a command to go to stow position
 
     public Angle getCurrentAngle() {
-        return Degrees.of(salvagePivotEncoder.get()*360);
+        return Degrees.of(salvagePivotEncoder.get() * 360);
     }
 
     public Command setAngle(Angle angle) {
         return Commands.runOnce(() -> {
-            double clampedAngle = Math.max(salvageConstants.SalvagePivotMinAngle.in(Degrees), Math.min(salvageConstants.SalvagePivotMaxAngle.in(Degrees), angle.in(Degrees)));
+            double clampedAngle = Math.max(
+                    salvageConstants.SalvagePivotMinAngle.in(Degrees),
+                    Math.min(salvageConstants.SalvagePivotMaxAngle.in(Degrees), angle.in(Degrees)));
             salvagePivotPID.setSetpoint(clampedAngle);
         });
     }
 
-    public Command intakeCommand(){
+    public Command intakeCommand() {
         return run(() -> salvageIntakeMotor.set(ControlMode.PercentOutput, salvageConstants.IntakeMotorSpeed));
     }
 
-    public Command outtakeCommand(){
+    public Command outtakeCommand() {
         return run(() -> salvageIntakeMotor.set(ControlMode.PercentOutput, -salvageConstants.IntakeMotorSpeed));
     }
 
-    public Command stopAll(){
+    public Command stopAll() {
         return Commands.runOnce(() -> {
             salvageIntakeMotor.set(ControlMode.PercentOutput, 0);
             salvagePivotMotor.set(ControlMode.PercentOutput, 0);
         });
     }
 
-    public Command goToStowAngle(){
+    public Command goToStowAngle() {
         return setAngle(salvageConstants.SalvagePivotStowAngle);
     }
 
-    public Command goToPickupAngle(){
+    public Command goToPickupAngle() {
         return setAngle(salvageConstants.SalvagePivotPickupAngle);
     }
 
-    public Command goToScoreAngle(){
+    public Command goToScoreAngle() {
         return setAngle(salvageConstants.SalvagePivotScoreAngle);
     }
 
+    public Command intake() {
+        return runEnd(
+                () -> {
+                    goToPickupAngle();
+                    intakeCommand();
+                },
+                () -> {
+                    goToStowAngle();
+                });
+    }
 
     @Override
     public void periodic() {
-        if(!salvagePivotPID.atSetpoint()){
-            setAngle(Degrees.of(salvagePivotPID.getSetpoint())).schedule();
+        if (Robot.isReal()) {
+            update().schedule();
         }
     }
 }
