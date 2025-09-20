@@ -37,11 +37,23 @@ public final class Constants {
     }
 
     public final class MotorIDs {
+        // Drive
         public static final int leftDriveMotor1 = 4;
         public static final int leftDriveMotor2 = 2;
         public static final int rightDriveMotor1 = 1;
         public static final int rightDriveMotor2 = 3;
-
         public static final int pigeonID = 5;
+        // 2 motors for scrapIntake, 1 motor for salvage intake, and 1 motor for pivot
+
+        // Scrap Intake
+        public static final int scrapIntakeMotor1 = 6;
+        public static final int scrapIntakeMotor2 = 7;
+
+        // Salvage Intake
+        public static final int salvageIntakeMotor = 8;
+
+        // Pivot
+        public static final int pivotMotor = 9;
+        public static final int pivotEncoder = 10;
     }
 }

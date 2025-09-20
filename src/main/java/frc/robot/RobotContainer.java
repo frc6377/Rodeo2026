@@ -20,7 +20,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.pivot.Pivot;
+import frc.robot.subsystems.salvageIntake.SalvageIntake;
+import frc.robot.subsystems.scrapIntake.ScrapIntake;
 import frc.robot.util.OILayer.OI;
 import frc.robot.util.OILayer.OIKeyboard;
 import frc.robot.util.OILayer.OIXbox;
@@ -35,6 +38,9 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
+    private final SalvageIntake salvageIntake;
+    private final ScrapIntake scrapIntake;
+    private final Pivot pivot;
 
     // Controller
     private final OI controller =
@@ -61,6 +67,10 @@ public class RobotContainer {
                 break;
         }
 
+        salvageIntake = new SalvageIntake();
+        scrapIntake = new ScrapIntake();
+        pivot = new Pivot();
+
         // Set up auto routines (Not AutoBuilder.buildAutoChooser() - Tank Don't Have Odometry)
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", new SendableChooser<Command>());
 
@@ -83,6 +93,14 @@ public class RobotContainer {
         // Reset gyro / odometry
         final Runnable resetGyro = () -> {};
         controller.zeroDrivebase().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+
+        controller.salvageIntake().whileTrue(salvageIntake.intakeCommand());
+        controller.salvageIntake().whileTrue(salvageIntake.outtakeCommand());
+        controller.scrapIntake().whileTrue(scrapIntake.intakeCommand());
+        controller.scrapIntake().whileTrue(scrapIntake.outtakeCommand());
+        controller.pivotStow().whileTrue(pivot.stowedPoseCommand());
+        controller.pivotScore().whileTrue(pivot.scorePoseCommand());
+        controller.test().whileTrue(pivot.testCommand());
     }
 
     /**

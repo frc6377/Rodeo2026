@@ -25,4 +25,32 @@ public interface OI {
     default Trigger zeroDrivebase() {
         return noButton;
     }
+
+    default Trigger salvageIntake() {
+        return noButton;
+    }
+
+    default Trigger salvageOuttake() {
+        return noButton;
+    }
+
+    default Trigger scrapIntake() {
+        return noButton;
+    }
+
+    default Trigger scrapOuttake() {
+        return noButton;
+    }
+
+    default Trigger pivotStow() {
+        return noButton;
+    }
+
+    default Trigger pivotScore() {
+        return noButton;
+    }
+
+    default Trigger test() {
+        return noButton;
+    }
 }
