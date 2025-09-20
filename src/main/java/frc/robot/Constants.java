@@ -39,10 +39,10 @@ public final class Constants {
     public final class MotorIDs {
 
         // Drive Motors
-        public static final int leftDriveMotor1 = 1;
-        public static final int leftDriveMotor2 = 2;
-        public static final int rightDriveMotor1 = 3;
-        public static final int rightDriveMotor2 = 4;
+        public static final int leftDriveMotor1 = 3;
+        public static final int leftDriveMotor2 = 4;
+        public static final int rightDriveMotor1 = 1;
+        public static final int rightDriveMotor2 = 2;
 
         // Pigeon
         public static final int pigeonID = 5;
