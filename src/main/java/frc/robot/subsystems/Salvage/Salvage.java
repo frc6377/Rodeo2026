@@ -1,6 +1,6 @@
 // Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// Open Source Software; you can modify and/or share it under the terms of the
+// WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems.Salvage;
 
@@ -18,21 +18,37 @@ import frc.robot.Constants;
 import frc.robot.Constants.salvageConstants;
 import frc.robot.Robot;
 
+import org.littletonrobotics.junction.Logger;
+
 public class Salvage extends SubsystemBase {
     /** Creates a new salvage. */
 
     // Motors
-    private final TalonSRX salvagePivotMotor;
+    private final TalonSRX salvagePivotLeader;
+
+    private final TalonSRX salvagePivotFollower;
 
     private final TalonSRX salvageIntakeMotor;
     private final DutyCycleEncoder salvagePivotEncoder;
-    private final PIDController salvagePivotPID;
+
     // Sensors
+    private final PIDController salvagePivotPID;
+
     public Salvage() {
-        salvagePivotMotor = new TalonSRX(Constants.MotorIDs.salvagePivotMotor);
-        salvagePivotMotor.setInverted(false);
+        // Pivot Leader Motor
+        salvagePivotLeader = new TalonSRX(Constants.MotorIDs.salvagePivotLeader);
+        salvagePivotLeader.setInverted(false);
+
+        // Pivot Follower Motor
+        salvagePivotFollower = new TalonSRX(Constants.MotorIDs.salvagePivotFollower);
+        salvagePivotFollower.setInverted(true);
+        salvagePivotFollower.follow(salvagePivotLeader);
+
+        // Intake Motor
         salvageIntakeMotor = new TalonSRX(Constants.MotorIDs.salvageIntakeMotor);
         salvageIntakeMotor.setInverted(false);
+
+        // Sensors
         salvagePivotEncoder = new DutyCycleEncoder(Constants.SensorIDs.salvagePivotEncoder);
         salvagePivotPID = new PIDController(
                 salvageConstants.salvagePivotP, salvageConstants.salvagePivotI, salvageConstants.salvagePivotD);
@@ -40,21 +56,23 @@ public class Salvage extends SubsystemBase {
     }
 
     public Command update() {
-        return run(() -> {
+        return runOnce(() -> {
             if (Math.abs(salvagePivotPID.getSetpoint() - getCurrentAngle().in(Degrees))
                     > 180) { // Make sure the pivot does not go through the robot
                 salvagePivotPID.setSetpoint(salvageConstants.SalvagePivotUpAngle.in(Degrees));
             }
             double output = salvagePivotPID.calculate(getCurrentAngle().in(Degrees));
-            salvagePivotMotor.set(ControlMode.PercentOutput, output);
+            salvagePivotLeader.set(ControlMode.PercentOutput, output);
+
+            // Logging
+            Logger.recordOutput("Salvage/Pivot Setpoint", salvagePivotPID.getSetpoint());
+            Logger.recordOutput("Salvage/Pivot Angle", getCurrentAngle().in(Degrees));
+            Logger.recordOutput("Salvage/Pivot Leader Output", salvagePivotLeader.getMotorOutputPercent());
+            Logger.recordOutput("Salvage/Pivot Follower Output", salvagePivotFollower.getMotorOutputPercent());
+            Logger.recordOutput("Salvage/Pivot At Setpoint", salvagePivotPID.atSetpoint());
+            Logger.recordOutput("Salvage/Intake Motor Output", salvageIntakeMotor.getMotorOutputPercent());
         });
     }
-
-    // TODO make a stop command
-
-    // TODO: Stop what? - ref. Line 47
-
-    // TODO make a command to go to stow position
 
     public Angle getCurrentAngle() {
         return Degrees.of(salvagePivotEncoder.get() * 360);
@@ -80,7 +98,7 @@ public class Salvage extends SubsystemBase {
     public Command stopAll() {
         return Commands.runOnce(() -> {
             salvageIntakeMotor.set(ControlMode.PercentOutput, 0);
-            salvagePivotMotor.set(ControlMode.PercentOutput, 0);
+            salvagePivotLeader.set(ControlMode.PercentOutput, 0);
         });
     }
 
@@ -112,5 +130,13 @@ public class Salvage extends SubsystemBase {
         if (Robot.isReal()) {
             update().schedule();
         }
+
+        //TODO: Don't move the logging, logging doesnt work when its inside the update command
+        Logger.recordOutput("Salvage/Pivot Setpoint", salvagePivotPID.getSetpoint());
+        Logger.recordOutput("Salvage/Pivot Angle", getCurrentAngle().in(Degrees));
+        Logger.recordOutput("Salvage/Pivot Leader Output", salvagePivotLeader.getMotorOutputPercent());
+        Logger.recordOutput("Salvage/Pivot Follower Output", salvagePivotFollower.getMotorOutputPercent());
+        Logger.recordOutput("Salvage/Pivot At Setpoint", salvagePivotPID.atSetpoint());
+        Logger.recordOutput("Salvage/Intake Motor Output", salvageIntakeMotor.getMotorOutputPercent());
     }
 }

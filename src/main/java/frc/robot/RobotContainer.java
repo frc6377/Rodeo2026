@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Drive.Drive;
+import frc.robot.subsystems.Salvage.Salvage;
 import frc.robot.util.OILayer.OI;
 import frc.robot.util.OILayer.OIKeyboard;
 import frc.robot.util.OILayer.OIXbox;
@@ -35,6 +36,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
+    private final Salvage salvage;
 
     // Controller
     private final OI controller =
@@ -49,15 +51,18 @@ public class RobotContainer {
             case REAL:
                 // Real robot, instantiate hardware IO implementations
                 drive = new Drive();
+                salvage = new Salvage();
                 break;
             case SIM:
                 // Sim robot, instantiate physics sim IO implementations
                 drive = new Drive();
+                salvage = new Salvage();
                 break;
 
             default:
                 // Replayed robot, disable IO implementations
                 drive = new Drive();
+                salvage = new Salvage();
                 break;
         }
 
