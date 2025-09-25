@@ -50,6 +50,7 @@ public final class Constants {
         // Scrap Motors IDs
         public static final int intakeMotorID = 6;
         public static final int pivotMotorID = 7;
+        public static final int pivotEncoderID = 9;
 
         // Salvage Motor IDs
         public static final int salvagePivotMotorID = 8;
