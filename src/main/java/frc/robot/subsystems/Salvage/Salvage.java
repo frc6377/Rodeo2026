@@ -7,18 +7,17 @@ package frc.robot.subsystems.Salvage;
 import static edu.wpi.first.units.Units.Degrees;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.salvageConstants;
 import frc.robot.Robot;
-
 import org.littletonrobotics.junction.Logger;
 
 public class Salvage extends SubsystemBase {
@@ -42,7 +41,7 @@ public class Salvage extends SubsystemBase {
 
         // Pivot Follower Motor
         salvagePivotFollower = new TalonSRX(Constants.MotorIDs.salvagePivotFollower);
-        salvagePivotFollower.setInverted(true);
+        salvagePivotFollower.setInverted(InvertType.FollowMaster);
         salvagePivotFollower.follow(salvagePivotLeader);
 
         // Intake Motor
@@ -91,9 +90,11 @@ public class Salvage extends SubsystemBase {
     public Command intakeCommand() {
         return run(() -> salvageIntakeMotor.set(ControlMode.PercentOutput, salvageConstants.IntakeMotorSpeed));
     }
+
     public Command holdCommand() {
         return run(() -> salvageIntakeMotor.set(ControlMode.PercentOutput, 0.1));
     }
+
     public Command outtakeCommand() {
         return run(() -> salvageIntakeMotor.set(ControlMode.PercentOutput, -salvageConstants.IntakeMotorSpeed));
     }
@@ -128,6 +129,7 @@ public class Salvage extends SubsystemBase {
                     holdCommand();
                 });
     }
+
     public Command outtake() {
         return Commands.startRun(
                 () -> {
@@ -138,13 +140,14 @@ public class Salvage extends SubsystemBase {
                     goToStowAngle();
                 });
     }
+
     @Override
     public void periodic() {
         if (Robot.isReal()) {
             update().schedule();
         }
 
-        //TODO: Don't move the logging, logging doesnt work when its inside the update command
+        // TODO: Don't move the logging, logging doesnt work when its inside the update command
         Logger.recordOutput("Salvage/Pivot Setpoint", salvagePivotPID.getSetpoint());
         Logger.recordOutput("Salvage/Pivot Angle", getCurrentAngle().in(Degrees));
         Logger.recordOutput("Salvage/Pivot Leader Output", salvagePivotLeader.getMotorOutputPercent());
