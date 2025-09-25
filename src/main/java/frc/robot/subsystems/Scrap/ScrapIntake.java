@@ -23,8 +23,6 @@ public class ScrapIntake extends SubsystemBase {
         pivotMotor.config_kD(0, 0.0);
 
         pivotEncoder = new CANcoder(MotorIDs.pivotEncoderID);
-
-
     }
 
     public Angle getPivotAngle() {

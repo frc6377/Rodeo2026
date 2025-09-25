@@ -13,6 +13,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -34,6 +36,18 @@ public final class Constants {
 
         /** Replaying from a log file. */
         REPLAY
+    }
+
+    public final class ArmConstants {
+        // Simulation constants
+        public static final DCMotor kArmMotor = DCMotor.getCIM(2);
+        public static final double kArmGearing = 40;
+        public static final double kArmMOI = 4.625509184446; // Units = m^2 kg
+        public static final double kArmMinAngle = Units.degreesToRadians(0);
+        public static final double kArmMaxAngle = Units.degreesToRadians(90);
+        public static final double kArmLength = Units.inchesToMeters(25.88);
+        public static final double kArmBaseAngle = 63.6;
+        public static final double kArmScoringAngle = Units.degreesToRadians(-45);
     }
 
     public final class MotorIDs {
