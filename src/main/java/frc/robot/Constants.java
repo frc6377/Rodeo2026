@@ -44,4 +44,12 @@ public final class Constants {
 
         public static final int pigeonID = 5;
     }
+
+    public final class armConstants {
+        public static final double armPercent = .225;
+    }
+
+    public static class intakeConstants {
+        public static final double intakePercent = .225;
+    }
 }
