@@ -47,7 +47,8 @@ public final class Constants {
 
         public static final int pigeonID = 5;
 
-        public static final int salvagePivotMotor = 6;
+        public static final int salvagePivotLeader = 6;
+        public static final int salvagePivotFollower = 9;
         public static final int salvageIntakeMotor = 7;
     }
 
