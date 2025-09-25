@@ -11,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -72,7 +73,9 @@ public class Salvage extends SubsystemBase {
     public Command intakeCommand() {
         return run(() -> salvageIntakeMotor.set(ControlMode.PercentOutput, salvageConstants.IntakeMotorSpeed));
     }
-
+    public Command holdCommand() {
+        return run(() -> salvageIntakeMotor.set(ControlMode.PercentOutput, 0.1));
+    }
     public Command outtakeCommand() {
         return run(() -> salvageIntakeMotor.set(ControlMode.PercentOutput, -salvageConstants.IntakeMotorSpeed));
     }
@@ -97,16 +100,26 @@ public class Salvage extends SubsystemBase {
     }
 
     public Command intake() {
-        return runEnd(
+        return Commands.startEnd(
                 () -> {
                     goToPickupAngle();
                     intakeCommand();
                 },
                 () -> {
                     goToStowAngle();
+                    holdCommand();
                 });
     }
-
+    public Command outtake() {
+        return Commands.startRun(
+                () -> {
+                    goToScoreAngle();
+                    outtakeCommand();
+                },
+                () -> {
+                    goToStowAngle();
+                });
+    }
     @Override
     public void periodic() {
         if (Robot.isReal()) {
