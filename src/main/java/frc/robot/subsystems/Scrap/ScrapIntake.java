@@ -40,8 +40,4 @@ public class ScrapIntake extends SubsystemBase {
     public boolean atSetpoint(Angle setpoint) {
         return pivotEncoder.getPosition().equals(setpoint);
     }
-
-    public void setIntakeSpeed(double speed) {
-        intakeMotor.set(TalonSRXControlMode.Current, speed);
-    }
 }
