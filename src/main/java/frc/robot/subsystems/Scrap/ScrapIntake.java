@@ -1,28 +1,26 @@
 package frc.robot.subsystems.scrap;
 
-import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix6.hardware.CANcoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.MotorIDs;
 
 public class ScrapIntake extends SubsystemBase {
-    private TalonSRX intakeMotor;
-    private TalonSRX pivotMotor;
+    private final ScrapIntakeIO io;
+    private final ScrapIntakeIO.ScrapIntakeIOInputs inputs = new ScrapIntakeIO.ScrapIntakeIOInputs();
 
-    private CANcoder pivotEncoder;
-
-    public ScrapIntake() {
-        intakeMotor = new TalonSRX(MotorIDs.intakeMotorID);
-        pivotMotor = new TalonSRX(MotorIDs.pivotMotorID);
-        pivotEncoder = new CANcoder(MotorIDs.pivotEncoderID);
+    public ScrapIntake(ScrapIntakeIO io) {
+        this.io = io;
     }
 
-    public void goToPivotPosition(double position) {
-        // Code to move pivot to a specific position
+    @Override
+    public void periodic() {
+        io.updateInputs(inputs);
+
+        SmartDashboard.putNumber("ScrapIntake/Arm Position", inputs.armPositionDegrees);
+        SmartDashboard.putNumber("ScrapIntake/Arm Current", inputs.armCurrentAmps);
+        SmartDashboard.putBoolean("ScrapIntake/At Setpoint", inputs.atSetpoint);
     }
 
-    public void setIntakeSpeed(double speed) {
-        intakeMotor.set(TalonSRXControlMode.Current, speed);
+    public void goToPosition(double degrees) {
+        io.setArmPosition(degrees);
     }
 }

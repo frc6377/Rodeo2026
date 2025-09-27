@@ -16,11 +16,13 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.scrap.ScrapIntake;
 import frc.robot.util.OILayer.OI;
 import frc.robot.util.OILayer.OIKeyboard;
 import frc.robot.util.OILayer.OIXbox;
@@ -35,6 +37,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
+    private final ScrapIntake scrapIntake;
 
     // Controller
     private final OI controller =
@@ -60,6 +63,10 @@ public class RobotContainer {
                 drive = new Drive();
                 break;
         }
+
+        scrapIntake = RobotBase.isReal()
+                ? new ScrapIntake(new frc.robot.subsystems.scrap.ScrapIntakeReal())
+                : new ScrapIntake(new frc.robot.subsystems.scrap.ScrapIntakeSim());
 
         // Set up auto routines (Not AutoBuilder.buildAutoChooser() - Tank Don't Have Odometry)
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", new SendableChooser<Command>());

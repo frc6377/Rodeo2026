@@ -25,4 +25,13 @@ public class ScrapShooter extends SubsystemBase {
                 },
                 this);
     }
+
+    public Command stopShooter() {
+        return Commands.run(
+                () -> {
+                    shooterMotor1.set(TalonSRXControlMode.Current, 0);
+                    shooterMotor2.set(TalonSRXControlMode.Current, 0);
+                },
+                this);
+    }
 }
