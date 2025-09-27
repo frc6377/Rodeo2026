@@ -56,4 +56,8 @@ public final class Constants {
         public static final int pivotMotor = 9;
         public static final int pivotEncoder = 10;
     }
+
+    public final class DIOConstants {
+        public static final int pivotEncoderID = 0;
+    }
 }

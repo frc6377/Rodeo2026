@@ -16,8 +16,8 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 /** Add your docs here. */
 public class PivotConstants {
-    public static final Angle kStowedPose = Degrees.of(0);
-    public static final Angle kScoredPose = Degrees.of(35);
+    public static final Angle kStowedPose = Degrees.of(10);
+    public static final Angle kScoredPose = Degrees.of(80);
 
     // 2 foot long arm, 1 cim motor, start angle = 0, end angle = 90, arm mass = 7.5
 
@@ -37,6 +37,7 @@ public class PivotConstants {
      */
     public static final DCMotor kGearbox = DCMotor.getCIM(1);
 
+    // Mech Sim
     public static final double kGearing = 25;
     public static final Distance kArmLength = Inches.of(24);
     public static final Angle kMinAngle = Degrees.of(0);
@@ -44,4 +45,6 @@ public class PivotConstants {
     public static final boolean kSimulateGravity = true;
     public static final Angle kStartAngle = Degrees.of(0);
     public static final double kMOI = SingleJointedArmSim.estimateMOI(kArmLength.in(Meters), Units.lbsToKilograms(7.5));
+
+    public static final Angle kOffset = Degrees.of(0);
 }
