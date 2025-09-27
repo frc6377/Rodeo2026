@@ -1,5 +1,6 @@
 package frc.robot.subsystems.scrap;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ScrapIntake extends SubsystemBase {
@@ -13,6 +14,10 @@ public class ScrapIntake extends SubsystemBase {
     @Override
     public void periodic() {
         io.updateInputs(inputs);
+
+        SmartDashboard.putNumber("ScrapIntake/Arm Position", inputs.armPositionDegrees);
+        SmartDashboard.putNumber("ScrapIntake/Arm Current", inputs.armCurrentAmps);
+        SmartDashboard.putBoolean("ScrapIntake/At Setpoint", inputs.atSetpoint);
     }
 
     public void goToPosition(double degrees) {
