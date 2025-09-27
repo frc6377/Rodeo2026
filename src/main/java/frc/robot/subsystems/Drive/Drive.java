@@ -8,12 +8,14 @@ import static edu.wpi.first.units.Units.KilogramMetersSquaredPerSecond;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.sim.Pigeon2SimState;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
@@ -33,6 +35,7 @@ import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotGearing;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotMotor;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotWheelSize;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -69,8 +72,12 @@ public class Drive extends SubsystemBase {
     private final Encoder leftEncoder;
     private final Encoder rightEncoder;
 
+    private EncoderSim leftEncoderSim = null;
+    private EncoderSim rightEncoderSim = null;
+    private Pigeon2SimState gyroSim = null;
+
     // Simulation
-    private DifferentialDrivetrainSim m_differentialDrivetrainSim;
+    private DifferentialDrivetrainSim diffDriveSim;
     private Field2d m_field;
 
     /** Creates a new ExampleSubsystem. */
@@ -96,13 +103,13 @@ public class Drive extends SubsystemBase {
         leftEncoder.setDistancePerPulse(
                 DriveConstants.wheelDiameter.in(Meters) * Math.PI / DriveConstants.encoderResolution);
 
-        rightEncoder = new Encoder(SensorIDs.driveRightEncoderA, SensorIDs.driveRightEncoderB, false);
-        leftEncoder.setDistancePerPulse(
+        rightEncoder = new Encoder(SensorIDs.driveRightEncoderA, SensorIDs.driveRightEncoderB, true);
+        rightEncoder.setDistancePerPulse(
                 DriveConstants.wheelDiameter.in(Meters) * Math.PI / DriveConstants.encoderResolution);
 
         diffDrive = new DifferentialDrive(
                 (speed) -> leftDriveLeader.set(ControlMode.PercentOutput, speed),
-                (speed) -> leftDriveLeader.set(ControlMode.PercentOutput, speed));
+                (speed) -> rightDriveLeader.set(ControlMode.PercentOutput, speed));
 
         diffOdometry = new DifferentialDriveOdometry(
                 gyro.getRotation2d(),
@@ -125,20 +132,23 @@ public class Drive extends SubsystemBase {
         robotConfig = new RobotConfig(
                 DriveConstants.robotMass.in(Kilograms),
                 DriveConstants.robotMOI.in(KilogramMetersSquaredPerSecond),
-                null,
+                driveModuleConfig,
                 DriveConstants.trackWidth.in(Meters));
 
         if (Robot.isSimulation()) {
             m_field = new Field2d();
+            leftEncoderSim = new EncoderSim(leftEncoder);
+            rightEncoderSim = new EncoderSim(rightEncoder);
+            gyroSim = new Pigeon2SimState(gyro);
             SmartDashboard.putData("Field", m_field);
 
-            m_differentialDrivetrainSim = DifferentialDrivetrainSim.createKitbotSim(
+            diffDriveSim = DifferentialDrivetrainSim.createKitbotSim(
                     KitbotMotor.kDualCIMPerSide, // 2 CIMs per side.
                     KitbotGearing.k10p71, // 10.71:1
                     KitbotWheelSize.kSixInch, // 6" diameter wheels.
                     null // No measurement noise.
                     );
-            m_differentialDrivetrainSim.setPose(new Pose2d(0.0, 4.5, new Rotation2d()));
+            diffDriveSim.setPose(new Pose2d(0.0, 4.5, new Rotation2d()));
         }
 
         AutoBuilder.configure(
@@ -187,7 +197,7 @@ public class Drive extends SubsystemBase {
 
     public double getDriveAngleDeg() {
         if (Robot.isSimulation()) {
-            return m_differentialDrivetrainSim.getPose().getRotation().getDegrees();
+            return diffDriveSim.getPose().getRotation().getDegrees();
         } else {
             return gyro.getYaw().getValueAsDouble();
         }
@@ -200,7 +210,7 @@ public class Drive extends SubsystemBase {
     public void driveRobotRelative(ChassisSpeeds speeds) {
         diffDrive.arcadeDrive(
                 speeds.vxMetersPerSecond / DriveConstants.maxSpeed.in(MetersPerSecond),
-                speeds.vxMetersPerSecond / DriveConstants.maxSpeed.in(MetersPerSecond));
+                speeds.omegaRadiansPerSecond / DriveConstants.maxRotation.in(RadiansPerSecond));
     }
 
     // Commands
@@ -233,20 +243,43 @@ public class Drive extends SubsystemBase {
         Logger.recordOutput("Drive/Right Motor 1", rightDriveLeader.getMotorOutputPercent());
         Logger.recordOutput("Drive/Right Motor 2", rightDriveFollower.getMotorOutputPercent());
 
-        Logger.recordOutput("Drive/Pigeon Yaw", getDriveAngleDeg());
         Logger.recordOutput("Drive/Target Angle Auto", targetAngle);
         SmartDashboard.putString(
                 "DriveCommand",
                 getCurrentCommand() != null ? getCurrentCommand().getName() : "No Command");
+
+        if (Robot.isReal()) {
+            Logger.recordOutput("Drive/Pigeon Yaw", getDriveAngleDeg());
+            Logger.recordOutput("Drive/Left Encoder Distance", leftEncoder.getDistance());
+            Logger.recordOutput("Drive/Right Encoder Distance", rightEncoder.getDistance());
+        }
     }
 
     @Override
     public void simulationPeriodic() {
-        m_differentialDrivetrainSim.setInputs(
+        diffDriveSim.setInputs(
                 leftDriveLeader.getMotorOutputPercent() * RobotController.getBatteryVoltage(),
                 rightDriveLeader.getMotorOutputPercent() * RobotController.getBatteryVoltage());
-        m_differentialDrivetrainSim.update(0.02);
 
-        m_field.setRobotPose(m_differentialDrivetrainSim.getPose());
+        Logger.recordOutput("Drive/leftOutput", leftDriveLeader.getMotorOutputPercent());
+        Logger.recordOutput("Drive/rightOutput", rightDriveLeader.getMotorOutputPercent());
+
+        diffDriveSim.update(0.02);
+
+        m_field.setRobotPose(diffDriveSim.getPose());
+
+        leftEncoderSim.setDistance(diffDriveSim.getLeftPositionMeters());
+        leftEncoderSim.setRate(diffDriveSim.getLeftVelocityMetersPerSecond());
+
+        rightEncoderSim.setDistance(diffDriveSim.getRightPositionMeters());
+        rightEncoderSim.setRate(diffDriveSim.getRightVelocityMetersPerSecond());
+
+        Logger.recordOutput("Drive/SIM - Robot Pose", diffDriveSim.getPose());
+        Logger.recordOutput("Drive/SIM - Left Encoder Distance", leftEncoderSim.getDistance());
+        Logger.recordOutput("Drive/SIM - Right Encoder Distance", rightEncoderSim.getDistance());
+        Logger.recordOutput(
+                "Drive/Sim - Robot Rotation", diffDriveSim.getHeading().getDegrees());
+
+        gyroSim.setRawYaw(diffDriveSim.getHeading().getDegrees());
     }
 }

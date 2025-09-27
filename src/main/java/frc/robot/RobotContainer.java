@@ -15,9 +15,9 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Drive.Drive;
@@ -39,7 +39,7 @@ public class RobotContainer {
     private final Salvage salvage;
 
     // Controller
-    private final OI controller =
+    public final OI controller =
             Constants.currentMode.equals(Constants.Mode.SIM) && Constants.useKeyboard ? new OIKeyboard() : new OIXbox();
 
     // Dashboard inputs
@@ -67,7 +67,7 @@ public class RobotContainer {
         }
 
         // Set up auto routines (Not AutoBuilder.buildAutoChooser() - Tank Don't Have Odometry)
-        autoChooser = new LoggedDashboardChooser<>("Auto Choices", new SendableChooser<Command>());
+        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
         // Set up SysId routines
         autoChooser.addOption("Example Auto", Commands.none());
