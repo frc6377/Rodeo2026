@@ -2,8 +2,6 @@ package frc.robot.subsystems.salvage;
 
 import static edu.wpi.first.units.Units.Degrees;
 
-import java.util.Set;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.units.measure.Angle;
@@ -12,9 +10,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorIDs;
-import frc.robot.Constants.SensorIDs;
 import frc.robot.Constants.PivotConstants;
-
+import frc.robot.Constants.SensorIDs;
 
 public class Salvage extends SubsystemBase {
     private TalonSRX intakeMotor;
@@ -64,12 +61,10 @@ public class Salvage extends SubsystemBase {
 
     public Command moveArmCommand(Setpoint setpoint) {
         return Commands.run(() -> {
-            armMotor.set(ControlMode.Position, setpoint.getAngle().in(Degrees)*PivotConstants.gearRatio);
+            armMotor.set(ControlMode.Position, setpoint.getAngle().in(Degrees) * PivotConstants.gearRatio);
         });
     }
 
     @Override
-    public void periodic() {
-
-    }
+    public void periodic() {}
 }

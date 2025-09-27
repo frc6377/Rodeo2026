@@ -49,15 +49,28 @@ public class ScrapIntakeSim implements ScrapIntakeIO {
         inputs.atSetpoint = Math.abs(inputs.armPositionDegrees - armSetpoint) < 2.0;
     }
 
-    public void setArmPosition(double degrees) {}
+    public void setArmPosition(double degrees) {
+        armSetpoint = degrees;
+        baseMech.setAngle(degrees);
+    }
 
-    public void setRollerSpeed(double rpm) {}
+    public void setArmVoltage(double volts) {
+        armSim.setInput(volts);
+    }
 
-    public void setArmVoltage(double volts) {}
+    public void stopArm() {
+        armSim.setInput(0.0);
+    }
 
-    public void stopArm() {}
+    public void setRollerSpeed(double rpm) {
+        // None for simulation
+    }
 
-    public void setRollerVoltage(double volts) {}
+    public void setRollerVoltage(double volts) {
+        // None for simulation
+    }
 
-    public void stopRoller() {}
+    public void stopRoller() {
+        // None for simulation
+    }
 }
