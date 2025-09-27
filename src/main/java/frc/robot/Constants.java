@@ -38,7 +38,7 @@ public final class Constants {
         REPLAY
     }
 
-    public final class ArmConstants {
+    public final class ScrapArmConstants {
         // Simulation constants
         public static final DCMotor kArmMotor = DCMotor.getCIM(2);
         public static final double kArmGearing = 40;

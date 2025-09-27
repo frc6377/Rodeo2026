@@ -9,17 +9,21 @@ public interface ScrapIntakeIO {
         public boolean atSetpoint = false;
     }
 
-    public void updateInputs(ScrapIntakeIOInputs inputs);
+    default void updateInputs(ScrapIntakeIOInputs inputs) {}
 
-    public void setArmPosition(double degrees);
+    default void setArmPosition(double degrees) {}
 
-    public void setRollerSpeed(double rpm);
+    default void setRollerSpeed(double rpm) {}
 
-    public void setArmVoltage(double volts);
+    default void setArmVoltage(double volts) {}
 
-    public void stopArm();
+    default void stopArm() {}
 
-    public void setRollerVoltage(double volts);
+    default void setRollerVoltage(double volts) {}
 
-    public void stopRoller();
+    default void stopRoller() {}
+
+    default void pivotUp() {}
+
+    default void pivotDown() {}
 }

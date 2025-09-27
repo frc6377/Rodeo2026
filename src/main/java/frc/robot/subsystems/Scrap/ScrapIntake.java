@@ -23,4 +23,8 @@ public class ScrapIntake extends SubsystemBase {
     public void goToPosition(double degrees) {
         io.setArmPosition(degrees);
     }
+
+    public void setArmVoltage(double volts) {
+        io.setArmVoltage(volts);
+    }
 }

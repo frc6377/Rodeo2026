@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix6.hardware.CANcoder;
+import frc.robot.Constants.ScrapArmConstants;
 import frc.robot.Constants.MotorIDs;
 
 public class ScrapIntakeReal implements ScrapIntakeIO {
@@ -34,28 +35,48 @@ public class ScrapIntakeReal implements ScrapIntakeIO {
                 < 1.0; // TODO: 1 degree tolerance -> maybe change later depending on real robot testing
     }
 
+    @Override
     public void setArmPosition(double degrees) {
         armSetpoint = degrees;
         pivotMotor.set(TalonSRXControlMode.Position, degrees);
     }
 
+    @Override
     public void setArmVoltage(double volts) {
         pivotMotor.set(TalonSRXControlMode.PercentOutput, volts / 12.0);
     }
 
+    @Override
     public void stopArm() {
         pivotMotor.set(TalonSRXControlMode.PercentOutput, 0.0);
     }
 
+    @Override
     public void setRollerSpeed(double rpm) {
         intakeMotor.set(TalonSRXControlMode.Velocity, rpm);
     }
 
+    @Override
     public void setRollerVoltage(double volts) {
         intakeMotor.set(TalonSRXControlMode.PercentOutput, volts / 12.0);
     }
 
+    @Override
     public void stopRoller() {
         intakeMotor.set(TalonSRXControlMode.PercentOutput, 0.0);
+    }
+
+    @Override
+    public void pivotUp() {
+        if (armSetpoint < ScrapArmConstants.kArmMaxAngle) {
+            armSetpoint += 1.0;
+        }
+    }
+
+    @Override
+    public void pivotDown() {
+        if (armSetpoint > ScrapArmConstants.kArmMinAngle) {
+            armSetpoint -= 1.0;
+        }
     }
 }

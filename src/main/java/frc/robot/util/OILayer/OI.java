@@ -25,4 +25,20 @@ public interface OI {
     default Trigger zeroDrivebase() {
         return noButton;
     }
+
+    default Trigger pivotUp() {
+        return noButton;
+    }
+
+    default Trigger pivotDown() {
+        return noButton;
+    }
+
+    default Trigger shooterOuttake() {
+        return noButton;
+    }
+
+    default Trigger shooterIntake() {
+        return noButton;
+    }
 }

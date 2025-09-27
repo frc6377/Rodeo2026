@@ -90,6 +90,9 @@ public class RobotContainer {
         // Reset gyro / odometry
         final Runnable resetGyro = () -> {};
         controller.zeroDrivebase().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+
+        // Scrap Intake
+        controller.pivotUp().whileTrue(scrapIntake.pivotUp());
     }
 
     /**
