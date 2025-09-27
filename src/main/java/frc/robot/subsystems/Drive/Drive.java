@@ -126,7 +126,7 @@ public class Drive extends SubsystemBase {
                 DriveConstants.wheelDiameter.div(2.0),
                 DriveConstants.maxSpeed,
                 DriveConstants.wheelCOF,
-                DCMotor.getCIM(2),
+                DCMotor.getCIM(2).withReduction(10.71),
                 DriveConstants.motorCurrentLimit,
                 2);
         robotConfig = new RobotConfig(

@@ -10,10 +10,6 @@ public interface OI {
     public final ControlCurve driveTranslationCurve = new ControlCurve(1, 3, 0.2, true);
     public final ControlCurve driveRotationCurve = new ControlCurve(1, 3, 0.2, true);
 
-    default DoubleSupplier driveTranslationX() {
-        return noAxis;
-    }
-
     default DoubleSupplier driveTranslationY() {
         return noAxis;
     }

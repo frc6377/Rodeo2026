@@ -38,7 +38,7 @@ public class DriveConstants {
     public static final double encoderResolution = 2048;
     public static final Distance wheelDiameter = Inches.of(6);
 
-    public static final Distance trackWidth = Inches.of(22.5); // TODO:FIXIT
+    public static final Distance trackWidth = Inches.of(18);
 
     public static final LinearVelocity maxSpeed = MetersPerSecond.of(4.0); // TODO:FIXIT
     public static final AngularVelocity maxRotation = RadiansPerSecond.of(6.5); // TODO:FIXIT
@@ -49,5 +49,5 @@ public class DriveConstants {
 
     public static final double wheelCOF = 0.095;
 
-    public static final Current motorCurrentLimit = Amps.of(40); // TODO:FIXIT
+    public static final Current motorCurrentLimit = Amps.of(40);
 }
