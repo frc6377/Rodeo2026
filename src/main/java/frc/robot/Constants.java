@@ -55,6 +55,16 @@ public final class Constants {
         public static final int shooterMotor2ID = 11;
 
         // Salvage Motor IDs
-        public static final int salvagePivotMotorID = 8;
+        public static final int salvageMotor = 8;
+        public static final int salvageArmMotor = 12;
+    }
+
+    public final class SensorIDs {
+
+        public static final int salvagePivotEncoder = 4;
+    }
+
+    public final class PivotConstants {
+        public static final double gearRatio = 40; // TO BE CHANGED
     }
 }
