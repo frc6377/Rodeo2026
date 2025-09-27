@@ -45,8 +45,6 @@ public final class Constants {
         public static final int rightDriveLeader = 4;
         public static final int rightDriveFollower = 19;
 
-        public static final int pigeonID = 5;
-
         public static final int salvagePivotLeader = 6;
         public static final int salvagePivotFollower = 9;
         public static final int salvageIntakeMotor = 7;
@@ -54,6 +52,11 @@ public final class Constants {
 
     public final class SensorIDs {
         public static final int salvagePivotEncoder = 0; // TODO: FIXIT
+        public static final int pigeonID = 5;
+        public static final int driveRightEncoderA = 1;
+        public static final int driveRightEncoderB = 2;
+        public static final int driveLeftEncoderA = 3;
+        public static final int driveLeftEncoderB = 4;
     }
 
     public static class salvageConstants {

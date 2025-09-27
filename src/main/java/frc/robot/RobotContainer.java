@@ -83,7 +83,7 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         // Default command, normal field-relative drive
-        drive.setDefaultCommand(drive.driveCommand(controller.driveTranslationY(), controller.driveRotation()));
+        drive.setDefaultCommand(drive.arcadeDrive(controller.driveTranslationY(), controller.driveRotation()));
 
         // Reset gyro / odometry
         final Runnable resetGyro = () -> {};

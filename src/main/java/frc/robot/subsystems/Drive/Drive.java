@@ -4,13 +4,31 @@
 
 package frc.robot.subsystems.Drive;
 
+import static edu.wpi.first.units.Units.KilogramMetersSquaredPerSecond;
+import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPLTVController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotGearing;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotMotor;
@@ -22,19 +40,34 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.MotorIDs;
+import frc.robot.Constants.SensorIDs;
 import frc.robot.Robot;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
-    private final TalonSRX LeftDriveLeader;
+    private final TalonSRX leftDriveLeader;
     private final VictorSPX leftDriveFollower;
     private final TalonSRX rightDriveLeader;
     private final VictorSPX rightDriveFollower;
 
-    private final Pigeon2 drivePigeon2;
+    private final Pigeon2 gyro;
+
+    private final DifferentialDrive diffDrive;
 
     private Double targetAngle;
+
+    private final DifferentialDriveOdometry diffOdometry;
+
+    private final DifferentialDriveKinematics kinematics;
+
+    private DifferentialDriveWheelSpeeds wheelSpeeds;
+
+    private final RobotConfig robotConfig;
+    private final ModuleConfig driveModuleConfig;
+
+    private final Encoder leftEncoder;
+    private final Encoder rightEncoder;
 
     // Simulation
     private DifferentialDrivetrainSim m_differentialDrivetrainSim;
@@ -42,22 +75,58 @@ public class Drive extends SubsystemBase {
 
     /** Creates a new ExampleSubsystem. */
     public Drive() {
-        LeftDriveLeader = new TalonSRX(MotorIDs.leftDriveLeader);
+        leftDriveLeader = new TalonSRX(MotorIDs.leftDriveLeader);
+        leftDriveLeader.setInverted(false);
 
         leftDriveFollower = new VictorSPX(MotorIDs.leftDriveFollower);
-        leftDriveFollower.follow(LeftDriveLeader);
+        leftDriveFollower.follow(leftDriveLeader);
+        leftDriveFollower.setInverted(InvertType.FollowMaster);
 
         rightDriveLeader = new TalonSRX(MotorIDs.rightDriveLeader);
         rightDriveLeader.setInverted(true);
 
         rightDriveFollower = new VictorSPX(MotorIDs.rightDriveFollower);
         rightDriveFollower.follow(rightDriveLeader);
-        rightDriveFollower.setInverted(true);
+        rightDriveFollower.setInverted(InvertType.FollowMaster);
 
-        drivePigeon2 = new Pigeon2(MotorIDs.pigeonID);
-        drivePigeon2.setYaw(0);
+        gyro = new Pigeon2(SensorIDs.pigeonID);
+        gyro.setYaw(0);
 
-        targetAngle = drivePigeon2.getYaw().getValueAsDouble();
+        leftEncoder = new Encoder(SensorIDs.driveLeftEncoderA, SensorIDs.driveLeftEncoderB, true);
+        leftEncoder.setDistancePerPulse(
+                DriveConstants.wheelDiameter.in(Meters) * Math.PI / DriveConstants.encoderResolution);
+
+        rightEncoder = new Encoder(SensorIDs.driveRightEncoderA, SensorIDs.driveRightEncoderB, false);
+        leftEncoder.setDistancePerPulse(
+                DriveConstants.wheelDiameter.in(Meters) * Math.PI / DriveConstants.encoderResolution);
+
+        diffDrive = new DifferentialDrive(
+                (speed) -> leftDriveLeader.set(ControlMode.PercentOutput, speed),
+                (speed) -> leftDriveLeader.set(ControlMode.PercentOutput, speed));
+
+        diffOdometry = new DifferentialDriveOdometry(
+                gyro.getRotation2d(),
+                leftEncoder.getDistance(),
+                rightEncoder.getDistance(),
+                new Pose2d(0.0, 0.0, new Rotation2d(0.0)));
+
+        kinematics = new DifferentialDriveKinematics(DriveConstants.trackWidth.in(Meters));
+        wheelSpeeds = new DifferentialDriveWheelSpeeds(leftEncoder.getRate(), rightEncoder.getRate());
+
+        targetAngle = gyro.getYaw().getValueAsDouble();
+
+        driveModuleConfig = new ModuleConfig(
+                DriveConstants.wheelDiameter.div(2.0),
+                DriveConstants.maxSpeed,
+                DriveConstants.wheelCOF,
+                DCMotor.getCIM(2),
+                DriveConstants.motorCurrentLimit,
+                2);
+        robotConfig = new RobotConfig(
+                DriveConstants.robotMass.in(Kilograms),
+                DriveConstants.robotMOI.in(KilogramMetersSquaredPerSecond),
+                null,
+                DriveConstants.trackWidth.in(Meters));
 
         if (Robot.isSimulation()) {
             m_field = new Field2d();
@@ -71,6 +140,26 @@ public class Drive extends SubsystemBase {
                     );
             m_differentialDrivetrainSim.setPose(new Pose2d(0.0, 4.5, new Rotation2d()));
         }
+
+        AutoBuilder.configure(
+                this::getPose, // Robot pose supplier
+                this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting
+                // pose)
+                this::getCurrentSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+                (speeds) -> driveRobotRelative(
+                        speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds.
+                new PPLTVController(0.02), // PPLTVController is the built in path following controller for differential
+                // drive trains
+                robotConfig,
+                () -> {
+                    var alliance = DriverStation.getAlliance();
+                    if (alliance.isPresent()) {
+                        return alliance.get() == DriverStation.Alliance.Red;
+                    }
+                    return false;
+                },
+                this // Reference to this subsystem to set requirements
+                );
     }
 
     // Getters
@@ -79,9 +168,17 @@ public class Drive extends SubsystemBase {
                 && getDriveAngleDeg() < targetAngle + DriveConstants.angleTolerance);
     }
 
+    public Pose2d getPose() {
+        return diffOdometry.getPoseMeters();
+    }
+
+    public ChassisSpeeds getCurrentSpeeds() {
+        return kinematics.toChassisSpeeds(wheelSpeeds);
+    }
+
     // Functions
     public void setLeftPercent(double percent) {
-        LeftDriveLeader.set(ControlMode.PercentOutput, percent);
+        leftDriveLeader.set(ControlMode.PercentOutput, percent);
     }
 
     public void setRightPercent(double percent) {
@@ -92,23 +189,23 @@ public class Drive extends SubsystemBase {
         if (Robot.isSimulation()) {
             return m_differentialDrivetrainSim.getPose().getRotation().getDegrees();
         } else {
-            return drivePigeon2.getYaw().getValueAsDouble();
+            return gyro.getYaw().getValueAsDouble();
         }
     }
 
-    // Commands
-    public Command driveCommand(DoubleSupplier forwardAxis, DoubleSupplier turnAxis) {
-        // Inline construction of command goes here.
-        // Subsystem::RunOnce implicitly requires `this` subsystem.
-        return run(() -> {
-            double leftPercent = (forwardAxis.getAsDouble() * DriveConstants.maxDrivePercent)
-                    + (turnAxis.getAsDouble() * DriveConstants.maxTurnPercent);
-            double rightPercent = (forwardAxis.getAsDouble() * DriveConstants.maxDrivePercent)
-                    + (-turnAxis.getAsDouble() * DriveConstants.maxDrivePercent);
+    public void resetOdometry(Pose2d resetPose) {
+        diffOdometry.resetPose(resetPose);
+    }
 
-            LeftDriveLeader.set(ControlMode.PercentOutput, leftPercent);
-            rightDriveLeader.set(ControlMode.PercentOutput, rightPercent);
-        });
+    public void driveRobotRelative(ChassisSpeeds speeds) {
+        diffDrive.arcadeDrive(
+                speeds.vxMetersPerSecond / DriveConstants.maxSpeed.in(MetersPerSecond),
+                speeds.vxMetersPerSecond / DriveConstants.maxSpeed.in(MetersPerSecond));
+    }
+
+    // Commands
+    public Command arcadeDrive(DoubleSupplier forward, DoubleSupplier rotation) {
+        return run(() -> diffDrive.arcadeDrive(forward.getAsDouble(), rotation.getAsDouble()));
     }
 
     // Auto Functions
@@ -128,7 +225,10 @@ public class Drive extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Logger.recordOutput("Drive/Left Motor 1", LeftDriveLeader.getMotorOutputPercent());
+        diffOdometry.update(gyro.getRotation2d(), leftEncoder.getDistance(), rightEncoder.getDistance());
+        wheelSpeeds = new DifferentialDriveWheelSpeeds(leftEncoder.getRate(), rightEncoder.getRate());
+
+        Logger.recordOutput("Drive/Left Motor 1", leftDriveLeader.getMotorOutputPercent());
         Logger.recordOutput("Drive/Left Motor 2", leftDriveFollower.getMotorOutputPercent());
         Logger.recordOutput("Drive/Right Motor 1", rightDriveLeader.getMotorOutputPercent());
         Logger.recordOutput("Drive/Right Motor 2", rightDriveFollower.getMotorOutputPercent());
@@ -143,7 +243,7 @@ public class Drive extends SubsystemBase {
     @Override
     public void simulationPeriodic() {
         m_differentialDrivetrainSim.setInputs(
-                LeftDriveLeader.getMotorOutputPercent() * RobotController.getBatteryVoltage(),
+                leftDriveLeader.getMotorOutputPercent() * RobotController.getBatteryVoltage(),
                 rightDriveLeader.getMotorOutputPercent() * RobotController.getBatteryVoltage());
         m_differentialDrivetrainSim.update(0.02);
 
