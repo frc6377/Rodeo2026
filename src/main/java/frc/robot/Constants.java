@@ -37,12 +37,12 @@ public final class Constants {
     }
 
     public final class MotorIDs {
-        public static final int leftDriveMotor1 = 4;
-        public static final int leftDriveMotor2 = 2;
-        public static final int rightDriveMotor1 = 1;
+        public static final int leftDriveMotor1 = 2;
+        public static final int leftDriveMotor2 = 1;
+        public static final int rightDriveMotor1 = 4;
         public static final int rightDriveMotor2 = 3;
 
-        public static final int pigeonID = 5;
+        public static final int pigeonID = 10;
     }
 
     public final class armConstants {

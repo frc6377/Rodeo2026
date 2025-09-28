@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -42,17 +43,18 @@ public class Drive extends SubsystemBase {
     /** Creates a new ExampleSubsystem. */
     public Drive() {
         leftDriveMotor1 = new TalonSRX(MotorIDs.leftDriveMotor1);
-        leftDriveMotor1.setInverted(true);
+        leftDriveMotor1.setInverted(false);
 
         leftDriveMotor2 = new TalonSRX(MotorIDs.leftDriveMotor2);
         leftDriveMotor2.follow(leftDriveMotor1);
+        leftDriveMotor2.setInverted(InvertType.OpposeMaster);
 
         rightDriveMotor1 = new TalonSRX(MotorIDs.rightDriveMotor1);
-        // rightDriveMotor1.setInverted(true);
+        rightDriveMotor1.setInverted(true);
 
         rightDriveMotor2 = new TalonSRX(MotorIDs.rightDriveMotor2);
         rightDriveMotor2.follow(rightDriveMotor1);
-        // rightDriveMotor2.setInverted(true);
+        rightDriveMotor2.setInverted(InvertType.OpposeMaster);
 
         drivePigeon2 = new Pigeon2(MotorIDs.pigeonID);
         drivePigeon2.setYaw(0);
