@@ -5,8 +5,10 @@
 package frc.robot.subsystems.pivot;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -14,6 +16,7 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
@@ -34,6 +37,8 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class Pivot extends SubsystemBase {
     private TalonSRX pivotMotor;
+    private AngularVelocity motorVelocity;
+    private Angle pastMotor;
 
     // Sim
     private SingleJointedArmSim pivotSim;
@@ -50,6 +55,7 @@ public class Pivot extends SubsystemBase {
     private LoggedNetworkNumber tuneP;
     private LoggedNetworkNumber tuneI;
     private LoggedNetworkNumber tuneD;
+    private LoggedNetworkNumber tuneKG;
 
     /** Creates a new Pivot. */
     public Pivot() {
@@ -57,12 +63,16 @@ public class Pivot extends SubsystemBase {
 
         encoder = new DutyCycleEncoder(DIOConstants.pivotEncoderID);
 
-        pivotPID = new PIDController(1, 0, 0);
+        pivotPID = new PIDController(.01, 0, 0);
         pivotFeedforward = new ArmFeedforward(0, 0, 0, 0);
 
         tuneP = new LoggedNetworkNumber("Pivot/PID/P");
         tuneI = new LoggedNetworkNumber("Pivot/PID/I");
         tuneD = new LoggedNetworkNumber("Pivot/PID/D");
+        tuneKG = new LoggedNetworkNumber("Pivot/PID/KG");
+
+        motorVelocity = DegreesPerSecond.of(0);
+        pastMotor = Radians.of(encoder.get());
 
         if (Robot.isSimulation()) {
             encoderSim = new DutyCycleEncoderSim(encoder);
@@ -89,6 +99,10 @@ public class Pivot extends SubsystemBase {
                 : Radians.of(encoder.get() + PivotConstants.kOffset.in(Radians));
     }
 
+    public AngularVelocity getPivotVel() {
+        return motorVelocity;
+    }
+
     public Command pivotToPose(Angle targetPose) {
         return Commands.sequence(
                         Commands.runOnce(() -> {
@@ -98,8 +112,10 @@ public class Pivot extends SubsystemBase {
                                 () -> {
                                     double output =
                                             pivotPID.calculate(getPivotAngle().in(Degrees));
-                                    pivotMotor.set(ControlMode.PercentOutput, output);
-                                    Logger.recordOutput("Pivot/Output (Deg)", output);
+                                    double pivotFF = pivotFeedforward.calculate(targetPose.in(Radians), 0);
+                                    pivotMotor.set(ControlMode.PercentOutput, output + pivotFF);
+                                    Logger.recordOutput("Pivot/Output", output);
+                                    Logger.recordOutput("Pivot/Feed Forward", pivotFF);
                                 },
                                 this))
                 .withName("pivotToPose");
@@ -135,14 +151,20 @@ public class Pivot extends SubsystemBase {
         tuneP.periodic();
         tuneI.periodic();
         tuneD.periodic();
+        tuneKG.periodic();
 
         pivotPID.setPID(tuneP.get(), tuneI.get(), tuneD.get());
+        pivotFeedforward.setKg(tuneKG.get());
 
         Logger.recordOutput("Pivot/PID/P", pivotPID.getP());
         Logger.recordOutput("Pivot/PID/I", pivotPID.getI());
         Logger.recordOutput("Pivot/PID/D", pivotPID.getD());
 
-        Logger.recordOutput("Pivot/PID/tuneP", tuneP.get());
+        // Logger.recordOutput("Pivot/PID/tuneP", tuneP.get());
+
+        motorVelocity = RadiansPerSecond.of(encoder.get() - pastMotor.in(Radians) * (5));
+
+        pastMotor = Radians.of(encoder.get());
     }
 
     @Override

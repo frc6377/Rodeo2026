@@ -41,7 +41,7 @@ public class PivotConstants {
     public static final double kGearing = 25;
     public static final Distance kArmLength = Inches.of(24);
     public static final Angle kMinAngle = Degrees.of(0);
-    public static final Angle kMaxAngle = Degrees.of(90);
+    public static final Angle kMaxAngle = Degrees.of(180);
     public static final boolean kSimulateGravity = true;
     public static final Angle kStartAngle = Degrees.of(0);
     public static final double kMOI = SingleJointedArmSim.estimateMOI(kArmLength.in(Meters), Units.lbsToKilograms(7.5));
