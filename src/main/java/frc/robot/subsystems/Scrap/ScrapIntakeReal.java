@@ -6,8 +6,8 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix6.hardware.CANcoder;
-import frc.robot.Constants.ScrapArmConstants;
 import frc.robot.Constants.MotorIDs;
+import frc.robot.Constants.ScrapArmConstants;
 
 public class ScrapIntakeReal implements ScrapIntakeIO {
 

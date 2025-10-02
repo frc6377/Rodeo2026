@@ -34,6 +34,10 @@ public interface OI {
         return noButton;
     }
 
+    default Trigger intake() {
+        return noButton;
+    }
+
     default Trigger shooterOuttake() {
         return noButton;
     }

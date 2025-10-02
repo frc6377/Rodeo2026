@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.scrap.ScrapIntake;
+import frc.robot.subsystems.scrap.ScrapShooter;
 import frc.robot.util.OILayer.OI;
 import frc.robot.util.OILayer.OIKeyboard;
 import frc.robot.util.OILayer.OIXbox;
@@ -38,6 +39,7 @@ public class RobotContainer {
     // Subsystems
     private final Drive drive;
     private final ScrapIntake scrapIntake;
+    private final ScrapShooter scrapShooter = new ScrapShooter();
 
     // Controller
     private final OI controller =
@@ -92,7 +94,10 @@ public class RobotContainer {
         controller.zeroDrivebase().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
         // Scrap Intake
-        controller.pivotUp().whileTrue(scrapIntake.pivotUp());
+        controller.intake().whileTrue(scrapIntake.intake());
+
+        // Shooter
+        controller.shooterOuttake().whileTrue(scrapShooter.setShooterSpeed(1));
     }
 
     /**
