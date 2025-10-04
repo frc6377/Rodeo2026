@@ -2,17 +2,29 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.intakeConstants;
+import frc.robot.Robot;
 import java.util.function.DoubleSupplier;
 
 public class IntakeSubsystem extends SubsystemBase {
     private final TalonSRX m_intakeMotor;
 
+    private FlywheelSim m_intakeSim;
+
     public IntakeSubsystem() {
         m_intakeMotor = new TalonSRX(5);
+
+        if (Robot.isSimulation()) {
+            m_intakeSim = new FlywheelSim(
+                    LinearSystemId.createFlywheelSystem(intakeConstants.kIntakeGearbox, 0, 0),
+                    intakeConstants.kIntakeGearbox,
+                    null);
+        }
     }
 
     public Command intakeCommand(DoubleSupplier leftTrigger, DoubleSupplier rightTrigger) {

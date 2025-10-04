@@ -13,6 +13,14 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Pounds;
+
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -47,9 +55,20 @@ public final class Constants {
 
     public final class armConstants {
         public static final double armPercent = .225;
+        public static final double kArmGearing = 1;
+
+        // Simulation Constants
+        public static final DCMotor kArmGearbox = DCMotor.getMiniCIM(1);
+        public static final Distance armLength = Inches.of(20);
+        public static final Mass k = Pounds.of(4.75);
+        public static final Angle armMinAngle = Degrees.of(0);
+        public static final Angle armMaxAngle = Degrees.of(45);
     }
 
     public static class intakeConstants {
         public static final double intakePercent = .225;
+
+        // Simulation Constants
+        public static final DCMotor kIntakeGearbox = DCMotor.getMiniCIM(1);
     }
 }
