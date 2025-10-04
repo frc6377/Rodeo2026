@@ -78,4 +78,9 @@ public class OIXbox implements OI {
     public Trigger shooterIntake() {
         return leftBumper;
     }
+
+    @Override
+    public Trigger intake() {
+        return a;
+    }
 }

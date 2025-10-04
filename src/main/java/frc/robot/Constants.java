@@ -53,18 +53,18 @@ public final class Constants {
     public final class MotorIDs {
 
         // Drive Motors
-        public static final int leftDriveMotor1 = 3;
-        public static final int leftDriveMotor2 = 4;
-        public static final int rightDriveMotor1 = 1;
-        public static final int rightDriveMotor2 = 2;
+        public static final int leftDriveMotor1 = 4;
+        public static final int leftDriveMotor2 = 3;
+        public static final int rightDriveMotor1 = 2;
+        public static final int rightDriveMotor2 = 1;
 
         // Pigeon
-        public static final int pigeonID = 5;
+        public static final int pigeonID = 9;
 
         // Scrap Motors IDs
         public static final int intakeMotorID = 6;
         public static final int pivotMotorID = 7;
-        public static final int pivotEncoderID = 9;
+        public static final int pivotEncoderID = 50;
         public static final int shooterMotor1ID = 10;
         public static final int shooterMotor2ID = 11;
 

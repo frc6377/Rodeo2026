@@ -4,15 +4,14 @@ import static edu.wpi.first.units.Units.Degrees;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix6.hardware.CANcoder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import com.ctre.phoenix6.hardware.CANcoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MotorIDs;
-import frc.robot.Constants.PivotConstants;
 import frc.robot.Constants.SensorIDs;
 
 public class Salvage extends SubsystemBase {
@@ -25,7 +24,7 @@ public class Salvage extends SubsystemBase {
         intakeMotor = new TalonSRX(MotorIDs.salvageMotor);
         armMotor = new TalonSRX(MotorIDs.salvageArmMotor);
         salvagePivotEncoder = new CANcoder(SensorIDs.salvagePivotEncoder);
-        
+
         armPIDController = new PIDController(0.02, 0.0, 0.0);
         armPIDController.setTolerance(2.0);
         armPIDController.enableContinuousInput(0, 360);
@@ -37,18 +36,16 @@ public class Salvage extends SubsystemBase {
 
     public Command intakeCommand() {
         return Commands.startEnd(
-            () -> intakeMotor.set(ControlMode.PercentOutput, 1.0),
-            () -> intakeMotor.set(ControlMode.PercentOutput, 0.0),
-            this
-        );
+                () -> intakeMotor.set(ControlMode.PercentOutput, 1.0),
+                () -> intakeMotor.set(ControlMode.PercentOutput, 0.0),
+                this);
     }
 
     public Command outtakeCommand() {
         return Commands.startEnd(
-            () -> intakeMotor.set(ControlMode.PercentOutput, -1.0),
-            () -> intakeMotor.set(ControlMode.PercentOutput, 0.0),
-            this
-        );
+                () -> intakeMotor.set(ControlMode.PercentOutput, -1.0),
+                () -> intakeMotor.set(ControlMode.PercentOutput, 0.0),
+                this);
     }
 
     // 3 setpoints: intake, stow, frieght
@@ -72,20 +69,25 @@ public class Salvage extends SubsystemBase {
     }
 
     public Command moveArmCommand(Setpoint setpoint) {
-        return Commands.run(() -> {
-            double targetAngle = setpoint.getAngle().in(Degrees);
-            double currentAngle = getCurrentAngle().in(Degrees);
-            double output = armPIDController.calculate(currentAngle, targetAngle);
-            armMotor.set(ControlMode.PercentOutput, output);
-        }, this).until(() -> armPIDController.atSetpoint());
+        return Commands.run(
+                        () -> {
+                            double targetAngle = setpoint.getAngle().in(Degrees);
+                            double currentAngle = getCurrentAngle().in(Degrees);
+                            double output = armPIDController.calculate(currentAngle, targetAngle);
+                            armMotor.set(ControlMode.PercentOutput, output);
+                        },
+                        this)
+                .until(() -> armPIDController.atSetpoint());
     }
 
     public Command holdArmPositionCommand() {
-        return Commands.run(() -> {
-            double currentAngle = getCurrentAngle().in(Degrees);
-            double output = armPIDController.calculate(currentAngle);
-            armMotor.set(ControlMode.PercentOutput, output);
-        }, this);
+        return Commands.run(
+                () -> {
+                    double currentAngle = getCurrentAngle().in(Degrees);
+                    double output = armPIDController.calculate(currentAngle);
+                    armMotor.set(ControlMode.PercentOutput, output);
+                },
+                this);
     }
 
     public void stopArm() {
