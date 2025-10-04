@@ -11,6 +11,9 @@ public class OIXbox implements OI {
 
     private static final XboxController controller = new XboxController(0);
 
+    private static final ControlCurve driveForwardCurve = new ControlCurve(1, 2, 0.1, true);
+    private static final ControlCurve driveRotationCurve = new ControlCurve(1, 1, 0.15, true);
+
     // Face Buttons
     public static final Trigger a = new JoystickButton(controller, XboxController.Button.kA.value);
     public static final Trigger b = new JoystickButton(controller, XboxController.Button.kB.value);
@@ -40,6 +43,7 @@ public class OIXbox implements OI {
             new JoystickButton(controller, XboxController.Button.kLeftStick.value);
     public static final Trigger rightStickButton =
             new JoystickButton(controller, XboxController.Button.kRightStick.value);
+
     public static final DoubleSupplier leftX = () -> controller.getRawAxis(XboxController.Axis.kLeftX.value);
     public static final DoubleSupplier leftY = () -> controller.getRawAxis(XboxController.Axis.kLeftY.value);
     public static final DoubleSupplier rightX = () -> controller.getRawAxis(XboxController.Axis.kRightX.value);
@@ -50,18 +54,13 @@ public class OIXbox implements OI {
     public static final Trigger back = new JoystickButton(controller, XboxController.Button.kBack.value);
 
     @Override
-    public DoubleSupplier driveTranslationX() {
-        return leftX;
-    }
-
-    @Override
     public DoubleSupplier driveTranslationY() {
-        return leftY;
+        return () -> driveForwardCurve.calculate(leftY.getAsDouble());
     }
 
     @Override
     public DoubleSupplier driveRotation() {
-        return rightX;
+        return () -> driveRotationCurve.calculate(rightX.getAsDouble());
     }
 
     @Override

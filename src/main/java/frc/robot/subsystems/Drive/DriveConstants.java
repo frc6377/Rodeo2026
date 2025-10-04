@@ -4,6 +4,20 @@
 
 package frc.robot.subsystems.Drive;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.KilogramMetersSquaredPerSecond;
+import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
+import edu.wpi.first.units.measure.AngularMomentum;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Mass;
+
 /** Add your docs here. */
 public class DriveConstants {
     // Sum of these value should be <= 1 (can be over, would not cause problems)
@@ -20,4 +34,20 @@ public class DriveConstants {
 
     public static final double minPower = 0.3;
     public static final double debounce = 1;
+
+    public static final double encoderResolution = 2048;
+    public static final Distance wheelDiameter = Inches.of(6);
+
+    public static final Distance trackWidth = Inches.of(18);
+
+    public static final LinearVelocity maxSpeed = MetersPerSecond.of(4.0); // TODO:FIXIT
+    public static final AngularVelocity maxRotation = RadiansPerSecond.of(6.5); // TODO:FIXIT
+
+    public static final Mass robotMass = Kilograms.of(50); // TODO:FIXIT
+
+    public static final AngularMomentum robotMOI = KilogramMetersSquaredPerSecond.of(6.0); // TODO:FIXIT
+
+    public static final double wheelCOF = 0.095;
+
+    public static final Current motorCurrentLimit = Amps.of(40);
 }

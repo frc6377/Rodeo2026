@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj.RobotBase;
  */
 public final class Constants {
     public static final boolean tuningMode = false;
-    public static final boolean useKeyboard = true;
+    public static final boolean useKeyboard = false;
     public static final Mode simMode = Mode.SIM;
     public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 
@@ -45,8 +45,6 @@ public final class Constants {
         public static final int rightDriveLeader = 4;
         public static final int rightDriveFollower = 19;
 
-        public static final int pigeonID = 5;
-
         public static final int salvagePivotLeader = 6;
         public static final int salvagePivotFollower = 9;
         public static final int salvageIntakeMotor = 7;
@@ -54,6 +52,11 @@ public final class Constants {
 
     public final class SensorIDs {
         public static final int salvagePivotEncoder = 0; // TODO: FIXIT
+        public static final int pigeonID = 5; // TODO: FIXIT
+        public static final int driveRightEncoderA = 1; // TODO: FIXIT
+        public static final int driveRightEncoderB = 2; // TODO: FIXIT
+        public static final int driveLeftEncoderA = 3; // TODO: FIXIT
+        public static final int driveLeftEncoderB = 4; // TODO: FIXIT
     }
 
     public static class salvageConstants {

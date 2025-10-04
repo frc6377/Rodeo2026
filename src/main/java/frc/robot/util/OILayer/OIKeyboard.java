@@ -56,11 +56,6 @@ public class OIKeyboard implements OI {
     public static final Trigger PgDown = new JoystickButton(controller, 6);
 
     @Override
-    public DoubleSupplier driveTranslationX() {
-        return AxisAD;
-    }
-
-    @Override
     public DoubleSupplier driveTranslationY() {
         return AxisWS;
     }

@@ -96,6 +96,8 @@ public class Robot extends LoggedRobot {
 
         // Return to normal thread priority
         Threads.setCurrentThreadPriority(false, 10);
+
+        Logger.recordOutput("Drive/Axis Test", robotContainer.getAxis());
     }
 
     /** This function is called once when the robot is disabled. */
