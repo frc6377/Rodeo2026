@@ -183,12 +183,12 @@ public class Drive extends SubsystemBase {
     }
 
     private Distance getEncoderDistance(CANcoder encoder) {
-        return Meters.of(
-                encoder.getPosition().getValue().in(Rotations) * DriveConstants.wheelCircumference.in(Meters));
+        return DriveConstants.wheelCircumference.times(
+                encoder.getPosition().getValue().in(Rotations));
     }
 
     private double getEncoderRate(CANcoder encoder) {
-        return (encoder.getVelocity().getValueAsDouble());
+        return encoder.getVelocity().getValueAsDouble();
     }
 
     // Functions
@@ -214,7 +214,7 @@ public class Drive extends SubsystemBase {
 
     public void driveRobotRelative(ChassisSpeeds speeds) {
         diffDrive.arcadeDrive(
-                speeds.vxMetersPerSecond / DriveConstants.maxSpeed.in(MetersPerSecond),
+                speeds.vxMetersPerSecond / DriveConstants.maxSpeed.in(MetersPerSecond) / (2 * Math.PI),
                 speeds.omegaRadiansPerSecond / DriveConstants.maxRotation.in(RadiansPerSecond));
     }
 
@@ -254,6 +254,8 @@ public class Drive extends SubsystemBase {
         Logger.recordOutput("Drive/LeftOutput", leftDriveLeader.getMotorOutputPercent());
         Logger.recordOutput("Drive/RightOutput", rightDriveLeader.getMotorOutputPercent());
 
+        Logger.recordOutput("Drive/Robot Pose", diffOdometry.getPoseMeters());
+
         Logger.recordOutput("Drive/Target Angle Auto", targetAngle);
         SmartDashboard.putString(
                 "DriveCommand",
@@ -275,6 +277,9 @@ public class Drive extends SubsystemBase {
         diffDriveSim.update(0.02);
 
         m_field.setRobotPose(diffDriveSim.getPose());
+
+        Logger.recordOutput("Drive/ SIM - leftEncoder", getEncoderDistance(leftEncoder));
+        Logger.recordOutput("Drive/ SIM - rightEncoder", getEncoderDistance(rightEncoder));
 
         Logger.recordOutput("Drive/SIM - Robot Pose", m_field.getRobotPose());
         Logger.recordOutput(
