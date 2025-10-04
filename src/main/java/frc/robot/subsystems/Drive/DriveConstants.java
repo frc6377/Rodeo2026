@@ -36,6 +36,7 @@ public class DriveConstants {
     public static final double debounce = 1;
 
     public static final double encoderResolution = 2048;
+    public static final Distance wheelCircumference = Inches.of(6).times(Math.PI);
     public static final Distance wheelDiameter = Inches.of(6);
 
     public static final Distance trackWidth = Inches.of(18);
