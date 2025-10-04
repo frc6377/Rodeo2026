@@ -67,4 +67,14 @@ public class OIXbox implements OI {
     public Trigger zeroDrivebase() {
         return start;
     }
+
+    @Override
+    public Trigger rightBumper() {
+        return rightBumper;
+    }
+
+    @Override
+    public Trigger rightTriggerButton() {
+        return rightTriggerAsButton;
+    }
 }

@@ -69,4 +69,14 @@ public class OIKeyboard implements OI {
     public Trigger zeroDrivebase() {
         return Z;
     }
+
+    @Override
+    public Trigger rightBumper() {
+        return V; // Using V button as right bumper
+    }
+
+    @Override
+    public Trigger rightTriggerButton() {
+        return C; // Using C button as right trigger
+    }
 }
