@@ -84,10 +84,16 @@ public class RobotContainer {
     private void configureButtonBindings() {
         // Default command, normal field-relative drive
         drive.setDefaultCommand(drive.driveCommand(controller.driveTranslationY(), controller.driveRotation()));
-
         // Reset gyro / odometry
         final Runnable resetGyro = () -> {};
         controller.zeroDrivebase().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+
+        // Salvage Control
+        controller.rightTriggerButton()
+                .whileTrue(salvage.intake());
+        controller.rightBumper()
+                .whileTrue(salvage.outtake());
+        
     }
 
     /**

@@ -5,6 +5,8 @@ import java.util.function.DoubleSupplier;
 
 public interface OI {
     public final Trigger noButton = new Trigger(() -> false);
+    public Trigger rightTriggerButton();
+    public Trigger rightBumper();
     public final DoubleSupplier noAxis = () -> 0.0;
 
     public final ControlCurve driveTranslationCurve = new ControlCurve(1, 3, 0.2, true);
