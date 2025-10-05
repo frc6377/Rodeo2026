@@ -2,14 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.drive;
+
+import java.util.function.DoubleSupplier;
+
+import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix6.hardware.Pigeon2;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotGearing;
@@ -23,8 +29,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.MotorIDs;
 import frc.robot.Robot;
-import java.util.function.DoubleSupplier;
-import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
     private final TalonSRX leftDriveMotor1;
@@ -35,6 +39,8 @@ public class Drive extends SubsystemBase {
     private final Pigeon2 drivePigeon2;
 
     private Double targetAngle;
+
+    private final DifferentialDriveOdometry diffOdometry;
 
     // Simulation
     private DifferentialDrivetrainSim m_differentialDrivetrainSim;
@@ -61,6 +67,12 @@ public class Drive extends SubsystemBase {
 
         targetAngle = drivePigeon2.getYaw().getValueAsDouble();
 
+        diffOdometry = new DifferentialDriveOdometry(
+                drivePigeon2.getRotation2d(),
+                leftEncoder.getDistance(),
+                rightEncoder.getDistance(),
+                new Pose2d(0.0, 0.0, new Rotation2d(0.0)));
+
         if (Robot.isSimulation()) {
             m_field = new Field2d();
             SmartDashboard.putData("Field", m_field);
@@ -73,12 +85,18 @@ public class Drive extends SubsystemBase {
                     );
             m_differentialDrivetrainSim.setPose(new Pose2d(0.0, 4.5, new Rotation2d()));
         }
+
+        
     }
 
     // Getters
     public Trigger isGyroInRange(double target) {
         return new Trigger(() -> targetAngle - DriveConstants.angleTolerance < getDriveAngleDeg()
                 && getDriveAngleDeg() < targetAngle + DriveConstants.angleTolerance);
+    }
+
+    public Pose2d getPose() {
+        return diffOdometry.getPoseMeters();
     }
 
     // Functions
