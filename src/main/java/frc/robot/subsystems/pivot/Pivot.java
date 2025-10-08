@@ -63,13 +63,13 @@ public class Pivot extends SubsystemBase {
 
         encoder = new DutyCycleEncoder(DIOConstants.pivotEncoderID);
 
-        pivotPID = new PIDController(.01, 0, 0);
+        pivotPID = new PIDController(1, 0, 0);
         pivotFeedforward = new ArmFeedforward(0, 0, 0, 0);
 
-        tuneP = new LoggedNetworkNumber("Pivot/PID/P");
-        tuneI = new LoggedNetworkNumber("Pivot/PID/I");
-        tuneD = new LoggedNetworkNumber("Pivot/PID/D");
-        tuneKG = new LoggedNetworkNumber("Pivot/PID/KG");
+        tuneP = new LoggedNetworkNumber("/Tuning/Pivot PID P");
+        tuneI = new LoggedNetworkNumber("/Tuning/Pivot PID I");
+        tuneD = new LoggedNetworkNumber("/Tuning/Pivot PID D");
+        tuneKG = new LoggedNetworkNumber("/Tuning/Pivot PID KG");
 
         motorVelocity = DegreesPerSecond.of(0);
         pastMotor = Radians.of(encoder.get());
