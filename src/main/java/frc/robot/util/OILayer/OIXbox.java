@@ -1,15 +1,19 @@
 package frc.robot.util.OILayer;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import java.util.function.DoubleSupplier;
 
 public class OIXbox implements OI {
     private static final double triggerThreshold = 0.5;
 
     private static final XboxController controller = new XboxController(0);
+
+    private static final ControlCurve driveForwardCurve = new ControlCurve(1, 2, 0.1, true);
+    private static final ControlCurve driveRotationCurve = new ControlCurve(1, 1, 0.15, true);
 
     // Face Buttons
     public static final Trigger a = new JoystickButton(controller, XboxController.Button.kA.value);
@@ -50,18 +54,13 @@ public class OIXbox implements OI {
     public static final Trigger back = new JoystickButton(controller, XboxController.Button.kBack.value);
 
     @Override
-    public DoubleSupplier driveTranslationX() {
-        return leftX;
-    }
-
-    @Override
     public DoubleSupplier driveTranslationY() {
-        return leftY;
+        return () -> driveForwardCurve.calculate(leftY.getAsDouble());
     }
 
     @Override
     public DoubleSupplier driveRotation() {
-        return rightX;
+        return () -> driveRotationCurve.calculate(rightX.getAsDouble());
     }
 
     @Override
