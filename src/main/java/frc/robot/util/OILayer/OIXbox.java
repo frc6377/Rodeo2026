@@ -1,11 +1,10 @@
 package frc.robot.util.OILayer;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import java.util.function.DoubleSupplier;
 
 public class OIXbox implements OI {
     private static final double triggerThreshold = 0.5;

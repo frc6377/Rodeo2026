@@ -27,7 +27,7 @@ public class ScrapIntakeSim implements ScrapIntakeIO {
                 ScrapArmConstants.kArmMotor,
                 ScrapArmConstants.kArmGearing,
                 ScrapArmConstants.kArmMOI,
-                ScrapArmConstants.kArmScoringAngle,
+                ScrapArmConstants.kArmLength,
                 ScrapArmConstants.kArmMinAngle,
                 ScrapArmConstants.kArmMaxAngle,
                 true,
@@ -60,7 +60,6 @@ public class ScrapIntakeSim implements ScrapIntakeIO {
 
         // Apply voltage and update sim
         armSim.setInput(voltage);
-        baseMech.setAngle(armSetpoint);
         armSim.update(0.02);
 
         // Update mechanism display
@@ -75,9 +74,7 @@ public class ScrapIntakeSim implements ScrapIntakeIO {
 
     @Override
     public void setArmPosition(double degrees) {
-        System.out.println("Sim setArmPosition called with: " + degrees);
         armSetpoint = degrees;
-        baseMech.setAngle(armSetpoint);
     }
 
     @Override

@@ -27,7 +27,7 @@ public class ScrapIntake extends SubsystemBase {
     }
 
     public Command intake() {
-        return runOnce(() -> io.setArmVoltage(ScrapArmConstants.kArmMinAngle))
-                .andThen(() -> io.setRollerVoltage(-6.0)); // TODO: refactor to be alongwith
+        return runOnce(() -> io.setArmVoltage(ScrapArmConstants.kArmScoringAngle))
+                .alongWith(runOnce(() -> io.setRollerVoltage(-6.0))); // TODO: refactor to be alongwith
     }
 }
