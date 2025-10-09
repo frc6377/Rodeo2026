@@ -76,7 +76,7 @@ public class OIKeyboard implements OI {
     }
 
     @Override
-    public Trigger pivotUp() {
+    public Trigger intake() {
         return Z;
     }
 

@@ -2,13 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.drive;
+
+import java.util.function.DoubleSupplier;
+
+import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix6.hardware.Pigeon2;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotGearing;
@@ -22,8 +29,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.MotorIDs;
 import frc.robot.Robot;
-import java.util.function.DoubleSupplier;
-import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
     private final TalonSRX leftDriveMotor1;
@@ -35,6 +40,8 @@ public class Drive extends SubsystemBase {
 
     private Double targetAngle;
 
+    private final DifferentialDriveOdometry diffOdometry;
+
     // Simulation
     private DifferentialDrivetrainSim m_differentialDrivetrainSim;
     private Field2d m_field;
@@ -42,19 +49,29 @@ public class Drive extends SubsystemBase {
     /** Creates a new ExampleSubsystem. */
     public Drive() {
         leftDriveMotor1 = new TalonSRX(MotorIDs.leftDriveMotor1);
+        leftDriveMotor1.setInverted(true);
+
         leftDriveMotor2 = new TalonSRX(MotorIDs.leftDriveMotor2);
         leftDriveMotor2.follow(leftDriveMotor1);
-        leftDriveMotor1.setInverted(true);
-        leftDriveMotor2.setInverted(true);
+        leftDriveMotor2.setInverted(InvertType.FollowMaster);
+
         rightDriveMotor1 = new TalonSRX(MotorIDs.rightDriveMotor1);
+        rightDriveMotor1.setInverted(true);
+
         rightDriveMotor2 = new TalonSRX(MotorIDs.rightDriveMotor2);
         rightDriveMotor2.follow(rightDriveMotor1);
-        rightDriveMotor1.setInverted(true);
-        rightDriveMotor2.setInverted(true);
+        rightDriveMotor2.setInverted(InvertType.FollowMaster);
+
         drivePigeon2 = new Pigeon2(MotorIDs.pigeonID);
         drivePigeon2.setYaw(0);
 
         targetAngle = drivePigeon2.getYaw().getValueAsDouble();
+
+        diffOdometry = new DifferentialDriveOdometry(
+                drivePigeon2.getRotation2d(),
+                leftEncoder.getDistance(),
+                rightEncoder.getDistance(),
+                new Pose2d(0.0, 0.0, new Rotation2d(0.0)));
 
         if (Robot.isSimulation()) {
             m_field = new Field2d();
@@ -68,12 +85,18 @@ public class Drive extends SubsystemBase {
                     );
             m_differentialDrivetrainSim.setPose(new Pose2d(0.0, 4.5, new Rotation2d()));
         }
+
+        
     }
 
     // Getters
     public Trigger isGyroInRange(double target) {
         return new Trigger(() -> targetAngle - DriveConstants.angleTolerance < getDriveAngleDeg()
                 && getDriveAngleDeg() < targetAngle + DriveConstants.angleTolerance);
+    }
+
+    public Pose2d getPose() {
+        return diffOdometry.getPoseMeters();
     }
 
     // Functions

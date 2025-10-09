@@ -3,6 +3,7 @@ package frc.robot.subsystems.scrap;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ScrapArmConstants;
 
 public class ScrapIntake extends SubsystemBase {
     private final ScrapIntakeIO io;
@@ -25,9 +26,8 @@ public class ScrapIntake extends SubsystemBase {
         io.setArmPosition(degrees);
     }
 
-    public Command intake(){
-        return runOnce(() -> io.setArmPosition(0); io.setRollerVoltage(-6.0));
+    public Command intake() {
+        return runOnce(() -> io.setArmVoltage(ScrapArmConstants.kArmMinAngle))
+                .andThen(() -> io.setRollerVoltage(-6.0)); // TODO: refactor to be alongwith
     }
-
-
 }
