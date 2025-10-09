@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.scrap.ScrapIntake;
 import frc.robot.subsystems.scrap.ScrapShooter;
 import frc.robot.util.OILayer.OI;
