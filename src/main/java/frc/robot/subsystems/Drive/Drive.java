@@ -13,6 +13,7 @@ import static edu.wpi.first.units.Units.Rotations;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.InvertType;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -86,18 +87,22 @@ public class Drive extends SubsystemBase {
     public Drive() {
         leftDriveLeader = new TalonSRX(MotorIDs.leftDriveLeader);
         leftDriveLeader.setInverted(false);
+        leftDriveLeader.setNeutralMode(NeutralMode.Brake);
 
         leftDriveFollower = new VictorSPX(MotorIDs.leftDriveFollower);
         leftDriveFollower.follow(leftDriveLeader);
         leftDriveFollower.setInverted(InvertType.FollowMaster);
+        leftDriveFollower.setNeutralMode(NeutralMode.Brake);
 
         rightDriveLeader = new TalonSRX(MotorIDs.rightDriveLeader);
         rightDriveLeader.setInverted(true);
+        rightDriveLeader.setNeutralMode(NeutralMode.Brake);
 
         rightDriveFollower = new VictorSPX(MotorIDs.rightDriveFollower);
         rightDriveFollower.follow(rightDriveLeader);
         rightDriveFollower.setInverted(InvertType.FollowMaster);
-
+        rightDriveFollower.setNeutralMode(NeutralMode.Coast);
+        
         gyro = new Pigeon2(SensorIDs.pigeonID);
         gyro.setYaw(0);
 

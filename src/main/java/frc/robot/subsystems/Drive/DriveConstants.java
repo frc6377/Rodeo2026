@@ -7,8 +7,8 @@ package frc.robot.subsystems.Drive;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.KilogramMetersSquaredPerSecond;
-import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import edu.wpi.first.units.measure.AngularMomentum;
@@ -44,7 +44,7 @@ public class DriveConstants {
     public static final LinearVelocity maxSpeed = MetersPerSecond.of(4.0); // TODO:FIXIT
     public static final AngularVelocity maxRotation = RadiansPerSecond.of(6.5); // TODO:FIXIT
 
-    public static final Mass robotMass = Kilograms.of(50); // TODO:FIXIT
+    public static final Mass robotMass = Pounds.of(61); // TODO:FIXIT
 
     public static final AngularMomentum robotMOI = KilogramMetersSquaredPerSecond.of(6.0); // TODO:FIXIT
 
