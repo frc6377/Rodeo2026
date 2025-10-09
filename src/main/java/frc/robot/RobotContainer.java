@@ -21,7 +21,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.salvage.Salvage;
 import frc.robot.subsystems.scrap.ScrapIntake;
 import frc.robot.subsystems.scrap.ScrapShooter;
 import frc.robot.util.OILayer.OI;
@@ -40,6 +41,7 @@ public class RobotContainer {
     private final Drive drive;
     private final ScrapIntake scrapIntake;
     private final ScrapShooter scrapShooter = new ScrapShooter();
+    private final Salvage salvage;
 
     // Controller
     private final OI controller =
@@ -69,6 +71,10 @@ public class RobotContainer {
         scrapIntake = RobotBase.isReal()
                 ? new ScrapIntake(new frc.robot.subsystems.scrap.ScrapIntakeReal())
                 : new ScrapIntake(new frc.robot.subsystems.scrap.ScrapIntakeSim());
+
+        salvage = RobotBase.isReal()
+                ? new Salvage(new frc.robot.subsystems.salvage.SalvageReal())
+                : new Salvage(new frc.robot.subsystems.salvage.SalvageSim());
 
         // Set up auto routines (Not AutoBuilder.buildAutoChooser() - Tank Don't Have Odometry)
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", new SendableChooser<Command>());

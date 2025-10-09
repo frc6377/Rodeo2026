@@ -2,50 +2,45 @@ package frc.robot.subsystems.salvage;
 
 import static edu.wpi.first.units.Units.Degrees;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix6.hardware.CANcoder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.MotorIDs;
-import frc.robot.Constants.SensorIDs;
 
 public class Salvage extends SubsystemBase {
-    private TalonSRX intakeMotor;
-    private TalonSRX armMotor;
-    private final CANcoder salvagePivotEncoder;
+    private final SalvageIO io;
+    private final SalvageIO.SalvageIOInputs inputs = new SalvageIO.SalvageIOInputs();
     private final PIDController armPIDController;
 
-    public Salvage() {
-        intakeMotor = new TalonSRX(MotorIDs.salvageMotor);
-        armMotor = new TalonSRX(MotorIDs.salvageArmMotor);
-        salvagePivotEncoder = new CANcoder(SensorIDs.salvagePivotEncoder);
-
+    public Salvage(SalvageIO io) {
+        this.io = io;
         armPIDController = new PIDController(0.02, 0.0, 0.0);
         armPIDController.setTolerance(2.0);
         armPIDController.enableContinuousInput(0, 360);
     }
 
+    @Override
+    public void periodic() {
+        io.updateInputs(inputs);
+
+        SmartDashboard.putNumber("Salvage/Arm Position", inputs.armPositionDegrees);
+        SmartDashboard.putNumber("Salvage/Arm Current", inputs.armCurrentAmps);
+        SmartDashboard.putNumber("Salvage/Intake Current", inputs.intakeCurrentAmps);
+        SmartDashboard.putBoolean("Salvage/At Setpoint", inputs.atSetpoint);
+    }
+
     public Angle getCurrentAngle() {
-        return Degrees.of(salvagePivotEncoder.getAbsolutePosition().getValueAsDouble() * 360);
+        return Degrees.of(inputs.armPositionDegrees);
     }
 
     public Command intakeCommand() {
-        return Commands.startEnd(
-                () -> intakeMotor.set(ControlMode.PercentOutput, 1.0),
-                () -> intakeMotor.set(ControlMode.PercentOutput, 0.0),
-                this);
+        return Commands.startEnd(() -> io.setIntakeSpeed(1.0), () -> io.stopIntake(), this);
     }
 
     public Command outtakeCommand() {
-        return Commands.startEnd(
-                () -> intakeMotor.set(ControlMode.PercentOutput, -1.0),
-                () -> intakeMotor.set(ControlMode.PercentOutput, 0.0),
-                this);
+        return Commands.startEnd(() -> io.setIntakeSpeed(-1.0), () -> io.stopIntake(), this);
     }
 
     // 3 setpoints: intake, stow, frieght
@@ -74,7 +69,7 @@ public class Salvage extends SubsystemBase {
                             double targetAngle = setpoint.getAngle().in(Degrees);
                             double currentAngle = getCurrentAngle().in(Degrees);
                             double output = armPIDController.calculate(currentAngle, targetAngle);
-                            armMotor.set(ControlMode.PercentOutput, output);
+                            io.setArmVoltage(output * 12.0);
                         },
                         this)
                 .until(() -> armPIDController.atSetpoint());
@@ -85,21 +80,16 @@ public class Salvage extends SubsystemBase {
                 () -> {
                     double currentAngle = getCurrentAngle().in(Degrees);
                     double output = armPIDController.calculate(currentAngle);
-                    armMotor.set(ControlMode.PercentOutput, output);
+                    io.setArmVoltage(output * 12.0);
                 },
                 this);
     }
 
     public void stopArm() {
-        armMotor.set(ControlMode.PercentOutput, 0.0);
+        io.stopArm();
     }
 
     public void stopIntake() {
-        intakeMotor.set(ControlMode.PercentOutput, 0.0);
-    }
-
-    @Override
-    public void periodic() {
-        SmartDashboard.putNumber("Salvage Arm Angle", getCurrentAngle().in(Degrees));
+        io.stopIntake();
     }
 }
