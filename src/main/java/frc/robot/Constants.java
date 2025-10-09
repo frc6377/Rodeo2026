@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.RobotBase;
  */
 public final class Constants {
     public static final boolean tuningMode = false;
-    public static final boolean useKeyboard = false;
+    public static final boolean useKeyboard = true;
     public static final Mode simMode = Mode.SIM;
     public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 

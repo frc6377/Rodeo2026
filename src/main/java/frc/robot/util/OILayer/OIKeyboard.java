@@ -94,4 +94,19 @@ public class OIKeyboard implements OI {
     public Trigger shooterIntake() {
         return V;
     }
+
+    @Override
+    public Trigger salvageIntake() {
+        return Period;
+    }
+
+    @Override
+    public Trigger salvageOuttake() {
+        return Comma;
+    }
+
+    @Override
+    public Trigger salvageArmTrigger() {
+        return M;
+    }
 }
