@@ -103,9 +103,9 @@ public class Drive extends SubsystemBase {
         // Inline construction of command goes here.
         // Subsystem::RunOnce implicitly requires `this` subsystem.
         return run(() -> {
-            double leftPercent = (forwardAxis.getAsDouble() * DriveConstants.maxDrivePercent)
+            double leftPercent = (-forwardAxis.getAsDouble() * DriveConstants.maxDrivePercent)
                     + (turnAxis.getAsDouble() * DriveConstants.maxTurnPercent);
-            double rightPercent = (forwardAxis.getAsDouble() * DriveConstants.maxDrivePercent)
+            double rightPercent = (-forwardAxis.getAsDouble() * DriveConstants.maxDrivePercent)
                     + (-turnAxis.getAsDouble() * DriveConstants.maxDrivePercent);
 
             leftDriveMotor1.set(ControlMode.PercentOutput, leftPercent);

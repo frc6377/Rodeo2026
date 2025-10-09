@@ -20,7 +20,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.util.OILayer.OI;
 import frc.robot.util.OILayer.OIKeyboard;
 import frc.robot.util.OILayer.OIXbox;
@@ -35,8 +38,12 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
+    private final ArmSubsystem armSubsystem;
+    private final IntakeSubsystem intakeSubsystem;
 
     // Controller
+    final CommandXboxController m_driverController = new CommandXboxController(0);
+
     private final OI controller =
             Constants.currentMode.equals(Constants.Mode.SIM) && Constants.useKeyboard ? new OIKeyboard() : new OIXbox();
 
@@ -60,6 +67,8 @@ public class RobotContainer {
                 drive = new Drive();
                 break;
         }
+        armSubsystem = new ArmSubsystem();
+        intakeSubsystem = new IntakeSubsystem();
 
         // Set up auto routines (Not AutoBuilder.buildAutoChooser() - Tank Don't Have Odometry)
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", new SendableChooser<Command>());
@@ -79,6 +88,13 @@ public class RobotContainer {
     private void configureButtonBindings() {
         // Default command, normal field-relative drive
         drive.setDefaultCommand(drive.driveCommand(controller.driveTranslationY(), controller.driveTranslationX()));
+
+        // intaking commands
+        m_driverController.a().whileTrue(armSubsystem.floorPickupCommand());
+        m_driverController.b().whileTrue(armSubsystem.scoreSalvageCommand());
+        m_driverController.x().whileTrue(armSubsystem.scoreScrapCommand());
+        intakeSubsystem.setDefaultCommand(intakeSubsystem.intakeCommand(
+                m_driverController::getLeftTriggerAxis, m_driverController::getRightTriggerAxis));
 
         // Reset gyro / odometry
         final Runnable resetGyro = () -> {};

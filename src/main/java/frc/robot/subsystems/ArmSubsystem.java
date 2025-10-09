@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
@@ -11,9 +12,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,15 +19,18 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.armConstants;
 import frc.robot.Robot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 
 public class ArmSubsystem extends SubsystemBase {
     // Add PIDController calculation to setArmMotor parameter
     private final TalonSRX m_armMotor;
     private final DutyCycleEncoder m_armEncoder;
 
-    private static Mechanism2d mech = new Mechanism2d(2, 2);
+    private static LoggedMechanism2d mech = new LoggedMechanism2d(2, 2);
     private DutyCycleEncoderSim m_armEncoderSim;
-    private MechanismLigament2d armMech;
+    private LoggedMechanismLigament2d armMech;
 
     private SingleJointedArmSim m_armSim;
 
@@ -44,76 +45,66 @@ public class ArmSubsystem extends SubsystemBase {
             m_armSim = new SingleJointedArmSim(
                     armConstants.kArmGearbox,
                     armConstants.kArmGearing,
-                    0,
+                    SingleJointedArmSim.estimateMOI(armConstants.armLength.in(Meters), 0.2),
                     armConstants.armLength.in(Meters),
                     armConstants.armMinAngle.in(Radians),
                     armConstants.armMaxAngle.in(Radians),
                     true,
-                    0,
-                    null);
+                    0);
 
             armMech = mech.getRoot("root", 1, 0)
-                    .append(new MechanismLigament2d("Arm Mech [0]", 1, 0, 10, new Color8Bit(Color.kPurple)));
-
-            SmartDashboard.putData("Arm Mech", mech);
+                    .append(new LoggedMechanismLigament2d("Arm Mech [0]", 1, 0, 10, new Color8Bit(Color.kPurple)));
+            Logger.recordOutput("Arm Mech", mech);
         }
     }
 
-    public Command armDownCommand() {
-        return startEnd(
-                () -> {
-                    double armPercent = armConstants.armPercent;
-
-                    m_armMotor.set(ControlMode.PercentOutput, armPercent);
-                },
-                () -> m_armMotor.set(ControlMode.PercentOutput, 0));
+    public Command scoreScrapCommand() {
+        return setArmCommand(45, armConstants.armPercent);
     }
 
-    public Command armUpCommand() {
-        return startEnd(
-                () -> {
-                    double armPercent = -armConstants.armPercent;
+    public Command scoreSalvageCommand() {
+        return setArmCommand(20, armConstants.armPercent);
+    }
 
-                    m_armMotor.set(ControlMode.PercentOutput, armPercent);
-                },
-                () -> m_armMotor.set(ControlMode.PercentOutput, 0));
+    public Command floorPickupCommand() {
+        return setArmCommand(-5, armConstants.armPercent);
     }
 
     public void setArmPercent(double percent) {
         m_armMotor.set(ControlMode.PercentOutput, percent);
     }
 
-    public Command setArmUpCommand(double angle, double percent) {
+    public Command setArmCommand(double angle, double percent) {
         return Commands.deadline(
-                Commands.waitUntil(() -> m_armEncoder.get() >= angle),
-                runEnd(
-                        () -> {
-                            setArmPercent(percent);
-                        },
-                        () -> {
-                            setArmPercent(0);
-                        }));
-    }
-
-    public Command setArmDownCommand(double angle, double percent) {
-        return Commands.deadline(
-                Commands.waitUntil(() -> m_armEncoder.get() <= angle),
-                runEnd(
-                        () -> {
-                            setArmPercent(percent);
-                        },
-                        () -> {
-                            setArmPercent(0);
-                        }));
+                        Commands.waitUntil(
+                                () -> m_armEncoder.get() * 360 <= angle + 5 && m_armEncoder.get() * 360 >= angle - 5),
+                        runEnd(
+                                () -> {
+                                    setArmPercent(percent);
+                                },
+                                () -> {
+                                    setArmPercent(0);
+                                }))
+                .withName("Arm Go To Command");
     }
 
     @Override
+    public void periodic() {
+        Logger.recordOutput(
+                "Arm Subsystem command",
+                getCurrentCommand() == null ? "null" : getCurrentCommand().getName());
+        Logger.recordOutput("Motor Output", m_armMotor.getMotorOutputPercent());
+        Logger.recordOutput("Motor Voltage", m_armMotor.getMotorOutputVoltage());
+    }
+
     public void simulationPeriodic() {
         m_armSim.setInputVoltage(m_armMotor.getMotorOutputVoltage());
         m_armSim.update(Robot.defaultPeriodSecs);
         final Angle simAngle = Radians.of(m_armSim.getAngleRads());
         m_armEncoderSim.set((simAngle).in(Rotations));
-
-        armMech.setAngle(simAngle.in(Radians));
+        Logger.recordOutput("Sim Angle in Radians", simAngle);
+        Logger.recordOutput("Sim Angle in Degrees", simAngle.in(Degrees));
+        armMech.setAngle(simAngle.in(Degrees));
+        Logger.recordOutput("Arm Mech", mech);
     }
 }

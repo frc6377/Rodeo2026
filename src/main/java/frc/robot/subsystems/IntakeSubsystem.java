@@ -21,9 +21,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
         if (Robot.isSimulation()) {
             m_intakeSim = new FlywheelSim(
-                    LinearSystemId.createFlywheelSystem(intakeConstants.kIntakeGearbox, 0, 0),
-                    intakeConstants.kIntakeGearbox,
-                    null);
+                    LinearSystemId.createFlywheelSystem(intakeConstants.kIntakeGearbox, 1, 1),
+                    intakeConstants.kIntakeGearbox);
         }
     }
 

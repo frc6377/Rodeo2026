@@ -54,19 +54,19 @@ public final class Constants {
     }
 
     public final class armConstants {
-        public static final double armPercent = .225;
+        public static final double armPercent = 1;
         public static final double kArmGearing = 1;
 
         // Simulation Constants
         public static final DCMotor kArmGearbox = DCMotor.getMiniCIM(1);
         public static final Distance armLength = Inches.of(20);
         public static final Mass k = Pounds.of(4.75);
-        public static final Angle armMinAngle = Degrees.of(0);
-        public static final Angle armMaxAngle = Degrees.of(45);
+        public static final Angle armMinAngle = Degrees.of(-5);
+        public static final Angle armMaxAngle = Degrees.of(90);
     }
 
     public static class intakeConstants {
-        public static final double intakePercent = .225;
+        public static final double intakePercent = 1;
 
         // Simulation Constants
         public static final DCMotor kIntakeGearbox = DCMotor.getMiniCIM(1);
