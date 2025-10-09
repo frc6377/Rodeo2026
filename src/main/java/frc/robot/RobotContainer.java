@@ -104,6 +104,9 @@ public class RobotContainer {
 
         // Shooter
         controller.shooterOuttake().whileTrue(scrapShooter.setShooterSpeed(1));
+
+        // Salvage
+        controller.salvageIntake().whileTrue(salvage.intakeCommand());
     }
 
     /**
