@@ -35,7 +35,11 @@ public class ScrapIntakeSim implements ScrapIntakeIO {
         armMechanism2d = new LoggedMechanism2d(1, 1);
         root = armMechanism2d.getRoot("Arm Sim", 0, 0);
         baseMech = root.append(new LoggedMechanismLigament2d(
-                "Arm Sim", ScrapArmConstants.kArmLength, ScrapArmConstants.kArmBaseAngle, 20, new Color8Bit(Color.kBlue)));
+                "Arm Sim",
+                ScrapArmConstants.kArmLength,
+                ScrapArmConstants.kArmBaseAngle,
+                20,
+                new Color8Bit(Color.kBlue)));
         armTab.add("Arm Mech", armMechanism2d);
     }
 
