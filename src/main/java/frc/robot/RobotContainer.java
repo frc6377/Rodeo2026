@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.salvage.Salvage;
 import frc.robot.subsystems.scrap.ScrapIntake;
 import frc.robot.subsystems.scrap.ScrapShooter;
 import frc.robot.util.OILayer.OI;
@@ -103,6 +104,9 @@ public class RobotContainer {
 
         // Shooter
         controller.shooterOuttake().whileTrue(scrapShooter.setShooterSpeed(1));
+
+        // Salvage
+        controller.salvageIntake().whileTrue(salvage.intakeCommand());
     }
 
     /**

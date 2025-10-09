@@ -45,4 +45,16 @@ public interface OI {
     default Trigger shooterIntake() {
         return noButton;
     }
+
+    default Trigger salvageIntake() {
+        return noButton;
+    }
+
+    default Trigger salvageOuttake() {
+        return noButton;
+    }
+
+    default Trigger salvageArmTrigger() {
+        return noButton;
+    }
 }
