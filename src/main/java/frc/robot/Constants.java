@@ -13,9 +13,17 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Pounds;
+
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 /**
  * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running on a roboRIO. Change
@@ -23,7 +31,7 @@ import edu.wpi.first.wpilibj.RobotBase;
  */
 public final class Constants {
     public static final boolean tuningMode = false;
-    public static final boolean useKeyboard = true;
+    public static final boolean useKeyboard = false;
     public static final Mode simMode = Mode.SIM;
     public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 
@@ -42,12 +50,16 @@ public final class Constants {
         // Simulation constants
         public static final DCMotor kArmMotor = DCMotor.getCIM(2);
         public static final double kArmGearing = 40;
-        public static final double kArmMOI = 4.625509184446; // Units = m^2 kg
-        public static final double kArmMinAngle = Units.degreesToRadians(0);
-        public static final double kArmMaxAngle = Units.degreesToRadians(90);
-        public static final double kArmLength = Units.inchesToMeters(25.88);
-        public static final double kArmBaseAngle = 63.6;
-        public static final double kArmScoringAngle = Units.degreesToRadians(-45);
+        public static final Angle kArmMinAngle = Degrees.of(0); // 0 degrees
+        public static final Angle kArmMaxAngle = Degrees.of(90); // 90 degrees
+        public static final Distance kArmLength = Inches.of(25.88);
+        public static final Angle kArmBaseAngle = Degrees.of(0);
+        public static final Angle kArmScoringAngle = Degrees.of(-45); // -45 degrees
+        public static final double kArmMOI = SingleJointedArmSim.estimateMOI(
+                kArmLength.in(Meters), Pounds.of(10).in(Kilograms));
+
+        public final double kP = 0.1;
+        public final double kD = 0.01;
     }
 
     public final class MotorIDs {

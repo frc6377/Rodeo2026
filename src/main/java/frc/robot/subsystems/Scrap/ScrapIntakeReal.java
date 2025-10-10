@@ -11,10 +11,10 @@ import frc.robot.Constants.ScrapArmConstants;
 
 public class ScrapIntakeReal implements ScrapIntakeIO {
 
-    private TalonSRX intakeMotor;
-    private TalonSRX pivotMotor;
-    private CANcoder pivotEncoder;
-    private double armSetpoint = 0.0;
+    protected TalonSRX intakeMotor;
+    protected TalonSRX pivotMotor;
+    protected CANcoder pivotEncoder;
+    protected double armSetpoint = 0.0;
 
     public ScrapIntakeReal() {
         intakeMotor = new TalonSRX(MotorIDs.intakeMotorID);
@@ -42,8 +42,8 @@ public class ScrapIntakeReal implements ScrapIntakeIO {
     }
 
     @Override
-    public void setArmVoltage(double volts) {
-        pivotMotor.set(TalonSRXControlMode.PercentOutput, volts / 12.0);
+    public void setArmPercent(double percent) {
+        pivotMotor.set(TalonSRXControlMode.PercentOutput, percent);
     }
 
     @Override
@@ -68,14 +68,14 @@ public class ScrapIntakeReal implements ScrapIntakeIO {
 
     @Override
     public void pivotUp() {
-        if (armSetpoint < ScrapArmConstants.kArmMaxAngle) {
+        if (armSetpoint < ScrapArmConstants.kArmMaxAngle.in(Degrees)) {
             armSetpoint += 1.0;
         }
     }
 
     @Override
     public void pivotDown() {
-        if (armSetpoint > ScrapArmConstants.kArmMinAngle) {
+        if (armSetpoint > ScrapArmConstants.kArmMinAngle.in(Degrees)) {
             armSetpoint -= 1.0;
         }
     }

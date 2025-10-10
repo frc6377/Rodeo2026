@@ -15,7 +15,7 @@ public interface ScrapIntakeIO {
 
     default void setRollerSpeed(double rpm) {}
 
-    default void setArmVoltage(double volts) {}
+    default void setArmPercent(double volts) {}
 
     default void gotoAngle() {}
 
