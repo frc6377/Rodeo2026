@@ -40,7 +40,7 @@ public class ScrapIntakeSim extends ScrapIntakeReal {
                 "Arm Sim",
                 ScrapArmConstants.kArmLength.in(Meters),
                 ScrapArmConstants.kArmBaseAngle.in(Radians),
-                15,
+                20,
                 new Color8Bit(Color.kBlue)));
         Logger.recordOutput("Arm Mech", armMechanism2d);
     }

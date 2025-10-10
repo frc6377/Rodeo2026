@@ -1,5 +1,8 @@
 package frc.robot.subsystems.scrap;
 
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj2.command.Command;
+
 public interface ScrapIntakeIO {
     public static class ScrapIntakeIOInputs {
         public double armPositionDegrees = 0.0;
@@ -11,7 +14,9 @@ public interface ScrapIntakeIO {
 
     default void updateInputs(ScrapIntakeIOInputs inputs) {}
 
-    default void setArmPosition(double degrees) {}
+    default Command setArmPosition(Angle degrees) {
+        return null;
+    }
 
     default void setRollerSpeed(double rpm) {}
 

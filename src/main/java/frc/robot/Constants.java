@@ -55,11 +55,16 @@ public final class Constants {
         public static final Distance kArmLength = Inches.of(25.88);
         public static final Angle kArmBaseAngle = Degrees.of(0);
         public static final Angle kArmScoringAngle = Degrees.of(-45); // -45 degrees
+        public static final Angle kArmIntakeAngle = Degrees.of(-5); // -45 degrees
+        public static final Angle kArmStowAngle = Degrees.of(90); // -45 degrees
         public static final double kArmMOI = SingleJointedArmSim.estimateMOI(
                 kArmLength.in(Meters), Pounds.of(10).in(Kilograms));
 
-        public final double kP = 0.1;
-        public final double kD = 0.01;
+        public static class PID {
+            public static final double kP = 0.1;
+            public static final double kI = 0.0;
+            public static final double kD = 0.01;
+        }
     }
 
     public final class MotorIDs {

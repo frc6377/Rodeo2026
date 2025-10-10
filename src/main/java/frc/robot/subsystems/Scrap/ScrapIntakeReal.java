@@ -3,11 +3,17 @@ package frc.robot.subsystems.scrap;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix6.hardware.CANcoder;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.MotorIDs;
 import frc.robot.Constants.ScrapArmConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class ScrapIntakeReal implements ScrapIntakeIO {
 
@@ -16,6 +22,8 @@ public class ScrapIntakeReal implements ScrapIntakeIO {
     protected CANcoder pivotEncoder;
     protected double armSetpoint = 0.0;
 
+    private PIDController pidController;
+
     public ScrapIntakeReal() {
         intakeMotor = new TalonSRX(MotorIDs.intakeMotorID);
         pivotMotor = new TalonSRX(MotorIDs.pivotMotorID);
@@ -23,6 +31,8 @@ public class ScrapIntakeReal implements ScrapIntakeIO {
         pivotMotor.config_kI(0, 0.0);
         pivotMotor.config_kD(0, 0.0);
         pivotEncoder = new CANcoder(MotorIDs.pivotEncoderID);
+
+        pidController = new PIDController(ScrapArmConstants.PID.kP, ScrapArmConstants.PID.kI, ScrapArmConstants.PID.kD);
     }
 
     @Override
@@ -36,9 +46,17 @@ public class ScrapIntakeReal implements ScrapIntakeIO {
     }
 
     @Override
-    public void setArmPosition(double degrees) {
-        armSetpoint = degrees;
-        pivotMotor.set(TalonSRXControlMode.Position, degrees);
+    public Command setArmPosition(Angle degrees) {
+        return Commands.sequence(
+                Commands.runOnce(() -> {
+                    pidController.setSetpoint(degrees.in(Degrees));
+                }),
+                Commands.run(() -> {
+                    double output =
+                            pidController.calculate(pivotEncoder.getPosition().getValueAsDouble());
+                    pivotMotor.set(ControlMode.PercentOutput, output);
+                    Logger.recordOutput("ScrapIntake/Output", output);
+                })); // TODO: ADD ARM FEEDFORWARD
     }
 
     @Override
