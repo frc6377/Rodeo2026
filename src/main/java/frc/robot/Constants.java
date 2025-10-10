@@ -16,6 +16,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
@@ -63,6 +64,7 @@ public final class Constants {
         public static final Mass k = Pounds.of(4.75);
         public static final Angle armMinAngle = Degrees.of(-5);
         public static final Angle armMaxAngle = Degrees.of(90);
+        public static final Angle Offset = Radians.of(0);
     }
 
     public static class intakeConstants {

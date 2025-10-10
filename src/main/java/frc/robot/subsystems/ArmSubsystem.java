@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.Rotations;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
@@ -31,6 +33,8 @@ public class ArmSubsystem extends SubsystemBase {
     private static LoggedMechanism2d mech = new LoggedMechanism2d(2, 2);
     private DutyCycleEncoderSim m_armEncoderSim;
     private LoggedMechanismLigament2d armMech;
+    private final PIDController armPID;
+    private final ArmFeedforward armFeedforward;
 
     private SingleJointedArmSim m_armSim;
 
@@ -38,6 +42,9 @@ public class ArmSubsystem extends SubsystemBase {
         m_armMotor = new TalonSRX(6);
         m_armMotor.setNeutralMode(NeutralMode.Brake);
         m_armEncoder = new DutyCycleEncoder(1);
+
+        armPID = new PIDController(1, 0, 0);
+        armFeedforward = new ArmFeedforward(0, 0, 0, 0);
 
         if (Robot.isSimulation()) {
             m_armEncoderSim = new DutyCycleEncoderSim(m_armEncoder);
@@ -59,33 +66,43 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public Command scoreScrapCommand() {
-        return setArmCommand(45, armConstants.armPercent);
+        return setArmCommand(Degrees.of(45));
     }
 
     public Command scoreSalvageCommand() {
-        return setArmCommand(20, armConstants.armPercent);
+        return setArmCommand(Degrees.of(20));
     }
 
     public Command floorPickupCommand() {
-        return setArmCommand(-5, armConstants.armPercent);
+        return setArmCommand(Degrees.of(-5));
     }
 
     public void setArmPercent(double percent) {
         m_armMotor.set(ControlMode.PercentOutput, percent);
     }
 
-    public Command setArmCommand(double angle, double percent) {
-        return Commands.deadline(
-                        Commands.waitUntil(
-                                () -> m_armEncoder.get() * 360 <= angle + 5 && m_armEncoder.get() * 360 >= angle - 5),
-                        runEnd(
+    public Angle getArmAngle() {
+        return Robot.isSimulation()
+                ? Radians.of(m_armEncoderSim.get())
+                : Radians.of(m_armEncoder.get() + armConstants.Offset.in(Radians));
+    }
+
+    public Command setArmCommand(Angle target) {
+        return Commands.sequence(
+                        Commands.runOnce(() -> {
+                            armPID.setSetpoint(target.in(Degrees));
+                        }),
+                        Commands.run(
                                 () -> {
-                                    setArmPercent(percent);
+                                    double output =
+                                            armPID.calculate(getArmAngle().in(Degrees));
+                                    double armFF = armFeedforward.calculate(target.in(Radians), 0);
+                                    m_armMotor.set(ControlMode.PercentOutput, output + armFF);
+                                    Logger.recordOutput("Arm/Output", output);
+                                    Logger.recordOutput("Arm/Feed Forward", armFF);
                                 },
-                                () -> {
-                                    setArmPercent(0);
-                                }))
-                .withName("Arm Go To Command");
+                                this))
+                .withName("Arm Go To command");
     }
 
     @Override
