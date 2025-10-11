@@ -95,9 +95,6 @@ public class RobotContainer {
         Command auto4 = Autos.ShootScrapAuto(drive, salvage, scrapIntake, scrapShooter);
         autoChooser.addOption(auto4.getName(), auto4);
 
-        Command auto5 = Autos.DelayedLeftScoreAuto(drive, salvage, scrapIntake, scrapShooter);
-        autoChooser.addOption(auto5.getName(), auto5);
-
         // Configure the button bindings
         configureButtonBindings();
     }
