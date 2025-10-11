@@ -28,6 +28,7 @@ import frc.robot.subsystems.scrap.ScrapShooter;
 import frc.robot.util.OILayer.OI;
 import frc.robot.util.OILayer.OIKeyboard;
 import frc.robot.util.OILayer.OIXbox;
+import frc.robot.util.OILayer.OIXboxJared;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -45,13 +46,14 @@ public class RobotContainer {
 
     // Controller
     private final OI controller =
-            Constants.currentMode.equals(Constants.Mode.SIM) && Constants.useKeyboard ? new OIKeyboard() : new OIXbox();
+            Constants.isJared ? new OIXboxJared() : new OIXbox();
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
+
         switch (Constants.currentMode) {
             case REAL:
                 // Real robot, instantiate hardware IO implementations
