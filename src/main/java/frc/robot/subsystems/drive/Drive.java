@@ -74,6 +74,7 @@ public class Drive extends SubsystemBase {
                     KitbotWheelSize.kSixInch, // 6" diameter wheels.
                     null // No measurement noise.
                     );
+            // CenterScore: 3.8, 1, 90 degrees | LeftScore: 1.6, 1, 0 degrees
             m_differentialDrivetrainSim.setPose(new Pose2d(1.6, 1, new Rotation2d(Math.PI / 2)));
         }
     }
