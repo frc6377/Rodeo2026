@@ -19,6 +19,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.salvageConstants;
 import frc.robot.Robot;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class Salvage extends SubsystemBase {
     /** Creates a new salvage. */
@@ -30,6 +31,12 @@ public class Salvage extends SubsystemBase {
 
     private final TalonSRX salvageIntakeMotor;
     private final DutyCycleEncoder salvagePivotEncoder;
+
+    private final LoggedNetworkNumber pivotP;
+    private final LoggedNetworkNumber pivotI;
+    private final LoggedNetworkNumber pivotD;
+
+    private final boolean tune = true;
 
     // Sensors
     private final PIDController salvagePivotPID;
@@ -48,21 +55,41 @@ public class Salvage extends SubsystemBase {
         salvageIntakeMotor = new TalonSRX(Constants.MotorIDs.salvageIntakeMotor);
         salvageIntakeMotor.setInverted(false);
 
+        // Tunable PID
+        pivotP = new LoggedNetworkNumber("Salvage/Pivot P", salvageConstants.salvagePivotP);
+        pivotI = new LoggedNetworkNumber("Salvage/Pivot I", salvageConstants.salvagePivotI);
+        pivotD = new LoggedNetworkNumber("Salvage/Pivot D", salvageConstants.salvagePivotD);
+
         // Sensors
         salvagePivotEncoder = new DutyCycleEncoder(Constants.SensorIDs.salvagePivotEncoder);
-        salvagePivotPID = new PIDController(
-                salvageConstants.salvagePivotP, salvageConstants.salvagePivotI, salvageConstants.salvagePivotD);
+
+        if (tune) {
+            salvagePivotPID = new PIDController(
+                    salvageConstants.salvagePivotP, salvageConstants.salvagePivotI, salvageConstants.salvagePivotD);
+        } else {
+            salvagePivotPID = new PIDController(pivotP.get(), pivotI.get(), pivotD.get());
+        }
+
         salvagePivotPID.setTolerance(salvageConstants.SalvagePivotTolerance.in(Degrees));
     }
 
     public Command update() {
         return runOnce(() -> {
             if (Math.abs(salvagePivotPID.getSetpoint() - getCurrentAngle().in(Degrees))
-                    > 180) { // Make sure the pivot does not go through the robot
+                            > Constants.salvageConstants.SalvagePivotMaxAngle.in(Degrees)
+                    || Math.abs(salvagePivotPID.getSetpoint()
+                                    - getCurrentAngle().in(Degrees))
+                            < Constants.salvageConstants.SalvagePivotMinAngle.in(Degrees)) {
                 salvagePivotPID.setSetpoint(salvageConstants.SalvagePivotUpAngle.in(Degrees));
             }
             double output = salvagePivotPID.calculate(getCurrentAngle().in(Degrees));
             salvagePivotLeader.set(ControlMode.PercentOutput, output);
+            
+            if(tune){
+                salvagePivotPID.setP(pivotP.get());
+                salvagePivotPID.setI(pivotI.get());
+                salvagePivotPID.setD(pivotD.get());
+            }
 
             // Logging
             Logger.recordOutput("Salvage/Pivot Setpoint", salvagePivotPID.getSetpoint());

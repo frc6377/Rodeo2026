@@ -64,7 +64,7 @@ public final class Constants {
         public static final double salvagePivotD = 0.0;
         // Angles
         public static final Angle SalvagePivotMinAngle = Degrees.of(0); // TODO: FIXIT
-        public static final Angle SalvagePivotMaxAngle = Degrees.of(0); // degrees
+        public static final Angle SalvagePivotMaxAngle = Degrees.of(200); // degrees
         public static final Angle SalvagePivotTolerance = Degrees.of(2); // degrees
         public static final Angle SalvagePivotInitialAngle = Degrees.of(0); // degrees
         public static final Angle SalvagePivotPickupAngle = Degrees.of(0); // degrees

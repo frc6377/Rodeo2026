@@ -100,8 +100,8 @@ public class RobotContainer {
         controller.zeroDrivebase().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
         // Salvage Control
-        controller.rightTriggerButton().whileTrue(salvage.intake());
-        controller.rightBumper().whileTrue(salvage.outtake());
+        controller.salvageIntake().whileTrue(salvage.intake());
+        controller.salvageOuttake().whileTrue(salvage.outtake());
     }
 
     /**
