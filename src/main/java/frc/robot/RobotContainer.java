@@ -21,12 +21,12 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.commands.Autos;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.salvage.Salvage;
 import frc.robot.subsystems.scrap.ScrapIntake;
 import frc.robot.subsystems.scrap.ScrapShooter;
 import frc.robot.util.OILayer.OI;
-import frc.robot.util.OILayer.OIKeyboard;
 import frc.robot.util.OILayer.OIXbox;
 import frc.robot.util.OILayer.OIXboxJared;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -45,8 +45,7 @@ public class RobotContainer {
     private final Salvage salvage;
 
     // Controller
-    private final OI controller =
-            Constants.isJared ? new OIXboxJared() : new OIXbox();
+    private final OI controller = Constants.isJared ? new OIXboxJared() : new OIXbox();
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -84,6 +83,18 @@ public class RobotContainer {
         // Set up SysId routines
         autoChooser.addOption("Example Auto", Commands.none());
 
+        Command auto1 = Autos.LeftScoreAuto(drive, salvage, scrapIntake, scrapShooter);
+        autoChooser.addOption(auto1.getName(), auto1);
+
+        Command auto2 = Autos.CenterScoreAuto(drive, salvage, scrapIntake, scrapShooter);
+        autoChooser.addOption(auto2.getName(), auto2);
+
+        Command auto3 = Autos.LeaveDockAuto(drive, salvage, scrapIntake, scrapShooter);
+        autoChooser.addOption(auto3.getName(), auto3);
+
+        Command auto4 = Autos.ShootScrapAuto(drive, salvage, scrapIntake, scrapShooter);
+        autoChooser.addOption(auto4.getName(), auto4);
+
         // Configure the button bindings
         configureButtonBindings();
     }
@@ -105,7 +116,7 @@ public class RobotContainer {
         controller.intake().whileTrue(scrapIntake.intake());
 
         // Shooter
-        controller.shooterOuttake().whileTrue(scrapShooter.setShooterSpeed(1));
+        controller.shooterOuttake().whileTrue(scrapShooter.shootScrap());
 
         // Salvage
         controller.salvageIntake().whileTrue(salvage.intakeCommand());

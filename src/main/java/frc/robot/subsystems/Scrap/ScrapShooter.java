@@ -17,7 +17,18 @@ public class ScrapShooter extends SubsystemBase {
         shooterMotor2 = new TalonSRX(MotorIDs.shooterMotor2ID);
     }
 
-    public Command setShooterSpeed(double speed) {
+    public Command shootScrap() {
+        return Commands.runEnd(
+                () -> {
+                    shooterMotor1.set(TalonSRXControlMode.Current, 1);
+                    shooterMotor2.set(TalonSRXControlMode.Current, 1);
+                },
+                () -> {
+                    stopShooter();
+                });
+    }
+
+    public Command startShooter(double speed) {
         return Commands.run(
                 () -> {
                     shooterMotor1.set(TalonSRXControlMode.Current, speed);

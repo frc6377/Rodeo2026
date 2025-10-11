@@ -8,6 +8,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix6.hardware.Pigeon2;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.RobotController;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.MotorIDs;
@@ -35,6 +37,8 @@ public class Drive extends SubsystemBase {
     private final Pigeon2 drivePigeon2;
 
     private Double targetAngle;
+
+    private PIDController pidController;
 
     // Simulation
     private DifferentialDrivetrainSim m_differentialDrivetrainSim;
@@ -60,6 +64,8 @@ public class Drive extends SubsystemBase {
         drivePigeon2.setYaw(0);
 
         targetAngle = drivePigeon2.getYaw().getValueAsDouble();
+
+        pidController = new PIDController(DriveConstants.kDriveP, DriveConstants.kDriveI, DriveConstants.kDriveD);
 
         if (Robot.isSimulation()) {
             m_field = new Field2d();
@@ -126,6 +132,35 @@ public class Drive extends SubsystemBase {
                             setLeftPercent(0);
                             setRightPercent(0);
                         }));
+    }
+
+    public Command turnCommand(double deg) {
+        targetAngle = getDriveAngleDeg() - deg;
+
+        return Commands.sequence(
+                        runOnce(() -> {
+                            targetAngle = getDriveAngleDeg() - deg;
+                        }),
+                        new PIDCommand(
+                                pidController,
+                                () -> getDriveAngleDeg(),
+                                () -> {
+                                    return targetAngle;
+                                },
+                                (output) -> {
+                                    SmartDashboard.putNumber("PID Output", output);
+                                    if (Math.abs(output) < DriveConstants.minPower && Math.abs(output) > 0.025) {
+                                        output = Math.copySign(DriveConstants.minPower, output);
+                                        setLeftPercent(-output);
+                                        setRightPercent(output);
+                                    } else {
+                                        setLeftPercent(-output);
+                                        setRightPercent(output);
+                                    }
+                                },
+                                this))
+                .until(isGyroInRange(targetAngle).debounce(DriveConstants.debounce))
+                .withName("Turn Command");
     }
 
     @Override
