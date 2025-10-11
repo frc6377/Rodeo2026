@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.MotorIDs;
 import frc.robot.Robot;
+import java.util.concurrent.atomic.DoubleAdder;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -131,27 +132,29 @@ public class Drive extends SubsystemBase {
     }
 
     public Command turnCommand(double deg) {
-        double targetAngle = getDriveAngleDeg() - deg;
+        DoubleAdder targetAngle = new DoubleAdder();
 
-        return Commands.sequence(new PIDCommand(
-                        pidController,
-                        () -> getDriveAngleDeg(),
-                        () -> {
-                            return targetAngle;
-                        },
-                        (output) -> {
-                            Logger.recordOutput("PID Output", output);
-                            if (Math.abs(output) < DriveConstants.minPower && Math.abs(output) > 0.025) {
-                                output = Math.copySign(DriveConstants.minPower, output);
-                                setLeftPercent(-output);
-                                setRightPercent(output);
-                            } else {
-                                setLeftPercent(-output);
-                                setRightPercent(output);
-                            }
-                        },
-                        this))
-                .until(isGyroInRange(targetAngle).debounce(DriveConstants.debounce))
+        return Commands.sequence(
+                        runOnce(() -> targetAngle.add(getDriveAngleDeg() - deg)),
+                        new PIDCommand(
+                                pidController,
+                                () -> getDriveAngleDeg(),
+                                () -> {
+                                    return targetAngle.doubleValue();
+                                },
+                                (output) -> {
+                                    Logger.recordOutput("PID Output", output);
+                                    if (Math.abs(output) < DriveConstants.minPower && Math.abs(output) > 0.025) {
+                                        output = Math.copySign(DriveConstants.minPower, output);
+                                        setLeftPercent(-output);
+                                        setRightPercent(output);
+                                    } else {
+                                        setLeftPercent(-output);
+                                        setRightPercent(output);
+                                    }
+                                },
+                                this))
+                .until(isGyroInRange(targetAngle.doubleValue()).debounce(DriveConstants.debounce))
                 .withName("Turn Command");
     }
 
