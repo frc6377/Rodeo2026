@@ -15,11 +15,12 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.autos.Autos;
 import frc.robot.subsystems.Drive.Drive;
 import frc.robot.subsystems.Salvage.Salvage;
 import frc.robot.util.OILayer.OI;
@@ -67,13 +68,18 @@ public class RobotContainer {
         }
 
         // Set up auto routines (Not AutoBuilder.buildAutoChooser() - Tank Don't Have Odometry)
-        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
-        // Set up SysId routines
-        autoChooser.addOption("Example Auto", Commands.none());
+        autoChooser = new LoggedDashboardChooser<>("Auto Choices", new SendableChooser<Command>());
+        addAutoCommands();
 
         // Configure the button bindings
         configureButtonBindings();
+    }
+
+    private void addAutoCommands() {
+        autoChooser.addOption("Do Nothing", Commands.none());
+        autoChooser.addOption("Drive and Turn", Autos.driveAndTurn(drive));
+        autoChooser.addOption("Pickup and Score", Autos.pickupAndScore(salvage));
+        autoChooser.addOption("One Salvage Middle", Autos.oneSalvageMiddle(salvage, drive));
     }
 
     public double getAxis() {

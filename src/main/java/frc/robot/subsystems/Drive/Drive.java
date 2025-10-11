@@ -4,41 +4,25 @@
 
 package frc.robot.subsystems.Drive;
 
-import static edu.wpi.first.units.Units.KilogramMetersSquaredPerSecond;
-import static edu.wpi.first.units.Units.Kilograms;
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Rotations;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.sim.Pigeon2SimState;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.ModuleConfig;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPLTVController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
-import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
-import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotGearing;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotMotor;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotWheelSize;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -63,20 +47,6 @@ public class Drive extends SubsystemBase {
 
     private Double targetAngle;
 
-    private final DifferentialDriveOdometry diffOdometry;
-
-    private final DifferentialDriveKinematics kinematics;
-
-    private DifferentialDriveWheelSpeeds wheelSpeeds;
-
-    private final RobotConfig robotConfig;
-    private final ModuleConfig driveModuleConfig;
-
-    private final CANcoder leftEncoder;
-    private final CANcoder rightEncoder;
-
-    private EncoderSim leftEncoderSim = null;
-    private EncoderSim rightEncoderSim = null;
     private Pigeon2SimState gyroSim = null;
 
     // Simulation
@@ -102,41 +72,15 @@ public class Drive extends SubsystemBase {
         rightDriveFollower.follow(rightDriveLeader);
         rightDriveFollower.setInverted(InvertType.FollowMaster);
         rightDriveFollower.setNeutralMode(NeutralMode.Coast);
-        
+
         gyro = new Pigeon2(SensorIDs.pigeonID);
         gyro.setYaw(0);
-
-        leftEncoder = new CANcoder(SensorIDs.driveLeftEncoder);
-
-        rightEncoder = new CANcoder(SensorIDs.driveRightEncoder);
 
         diffDrive = new DifferentialDrive(
                 (speed) -> leftDriveLeader.set(ControlMode.PercentOutput, speed),
                 (speed) -> rightDriveLeader.set(ControlMode.PercentOutput, speed));
 
-        diffOdometry = new DifferentialDriveOdometry(
-                gyro.getRotation2d(),
-                getEncoderDistance(leftEncoder),
-                getEncoderDistance(rightEncoder),
-                new Pose2d(0.0, 0.0, new Rotation2d(0.0)));
-
-        kinematics = new DifferentialDriveKinematics(DriveConstants.trackWidth.in(Meters));
-        wheelSpeeds = new DifferentialDriveWheelSpeeds(getEncoderRate(leftEncoder), getEncoderRate(rightEncoder));
-
         targetAngle = gyro.getYaw().getValueAsDouble();
-
-        driveModuleConfig = new ModuleConfig(
-                DriveConstants.wheelDiameter.div(2.0),
-                DriveConstants.maxSpeed,
-                DriveConstants.wheelCOF,
-                DCMotor.getCIM(1).withReduction(10.71),
-                DriveConstants.motorCurrentLimit,
-                2);
-        robotConfig = new RobotConfig(
-                DriveConstants.robotMass.in(Kilograms),
-                DriveConstants.robotMOI.in(KilogramMetersSquaredPerSecond),
-                driveModuleConfig,
-                DriveConstants.trackWidth.in(Meters));
 
         if (Robot.isSimulation()) {
             m_field = new Field2d();
@@ -145,55 +89,18 @@ public class Drive extends SubsystemBase {
 
             diffDriveSim = DifferentialDrivetrainSim.createKitbotSim(
                     KitbotMotor.kDualCIMPerSide, // 2 CIMs per side.
-                    KitbotGearing.k10p71, // 10.71:1
+                    KitbotGearing.k7p31, // 10.71:1
                     KitbotWheelSize.kSixInch, // 6" diameter wheels.
                     null // No measurement noise.
                     );
             diffDriveSim.setPose(new Pose2d(0.0, 4.5, new Rotation2d()));
         }
-
-        AutoBuilder.configure(
-                this::getPose, // Robot pose supplier
-                this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting
-                // pose)
-                this::getCurrentSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                (speeds) -> driveRobotRelative(
-                        speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds.
-                new PPLTVController(0.02), // PPLTVController is the built in path following controller for differential
-                // drive trains
-                robotConfig,
-                () -> {
-                    var alliance = DriverStation.getAlliance();
-                    if (alliance.isPresent()) {
-                        return alliance.get() == DriverStation.Alliance.Red;
-                    }
-                    return false;
-                },
-                this // Reference to this subsystem to set requirements
-                );
     }
 
     // Getters
     public Trigger isGyroInRange(double target) {
         return new Trigger(() -> targetAngle - DriveConstants.angleTolerance < getDriveAngleDeg()
                 && getDriveAngleDeg() < targetAngle + DriveConstants.angleTolerance);
-    }
-
-    public Pose2d getPose() {
-        return diffOdometry.getPoseMeters();
-    }
-
-    public ChassisSpeeds getCurrentSpeeds() {
-        return kinematics.toChassisSpeeds(wheelSpeeds);
-    }
-
-    private Distance getEncoderDistance(CANcoder encoder) {
-        return DriveConstants.wheelCircumference.times(
-                encoder.getPosition().getValue().in(Rotations));
-    }
-
-    private double getEncoderRate(CANcoder encoder) {
-        return encoder.getVelocity().getValueAsDouble();
     }
 
     // Functions
@@ -211,10 +118,6 @@ public class Drive extends SubsystemBase {
         } else {
             return gyro.getYaw().getValueAsDouble();
         }
-    }
-
-    public void resetOdometry(Pose2d resetPose) {
-        diffOdometry.resetPose(resetPose);
     }
 
     public void driveRobotRelative(ChassisSpeeds speeds) {
@@ -245,11 +148,6 @@ public class Drive extends SubsystemBase {
 
     @Override
     public void periodic() {
-        diffOdometry.update(
-                gyro.getRotation2d(),
-                getEncoderDistance(leftEncoder).in(Meters),
-                getEncoderDistance(rightEncoder).in(Meters));
-        wheelSpeeds = new DifferentialDriveWheelSpeeds(getEncoderRate(leftEncoder), getEncoderRate(rightEncoder));
 
         Logger.recordOutput("Drive/Left Motor 1", leftDriveLeader.getMotorOutputPercent());
         Logger.recordOutput("Drive/Left Motor 2", leftDriveFollower.getMotorOutputPercent());
@@ -259,8 +157,6 @@ public class Drive extends SubsystemBase {
         Logger.recordOutput("Drive/LeftOutput", leftDriveLeader.getMotorOutputPercent());
         Logger.recordOutput("Drive/RightOutput", rightDriveLeader.getMotorOutputPercent());
 
-        Logger.recordOutput("Drive/Robot Pose", diffOdometry.getPoseMeters());
-
         Logger.recordOutput("Drive/Target Angle Auto", targetAngle);
         SmartDashboard.putString(
                 "DriveCommand",
@@ -268,8 +164,6 @@ public class Drive extends SubsystemBase {
 
         if (Robot.isReal()) {
             Logger.recordOutput("Drive/Pigeon Yaw", getDriveAngleDeg());
-            Logger.recordOutput("Drive/Left Encoder Distance", getEncoderDistance(leftEncoder));
-            Logger.recordOutput("Drive/Right Encoder Distance", getEncoderDistance(rightEncoder));
         }
     }
 
@@ -282,9 +176,6 @@ public class Drive extends SubsystemBase {
         diffDriveSim.update(0.02);
 
         m_field.setRobotPose(diffDriveSim.getPose());
-
-        Logger.recordOutput("Drive/ SIM - leftEncoder", getEncoderDistance(leftEncoder));
-        Logger.recordOutput("Drive/ SIM - rightEncoder", getEncoderDistance(rightEncoder));
 
         Logger.recordOutput("Drive/SIM - Robot Pose", m_field.getRobotPose());
         Logger.recordOutput(
