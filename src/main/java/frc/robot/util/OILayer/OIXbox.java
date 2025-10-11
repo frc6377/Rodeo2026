@@ -69,12 +69,22 @@ public class OIXbox implements OI {
     }
 
     @Override
-    public Trigger salvageOuttake() {
+    public Trigger salvageOuttakeAngle() {
         return rightBumper;
     }
 
     @Override
-    public Trigger salvageIntake() {
+    public Trigger salvageIntakeAngle() {
+        return leftBumper;
+    }
+
+    @Override
+    public Trigger salvageOuttakeRoller() {
         return rightTriggerAsButton;
+    }
+
+    @Override
+    public Trigger salvageIntakeRoller() {
+        return leftTriggerAsButton;
     }
 }

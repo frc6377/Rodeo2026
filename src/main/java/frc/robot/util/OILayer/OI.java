@@ -25,10 +25,16 @@ public interface OI {
     default Trigger zeroDrivebase() {
         return noButton;
     }
-    default Trigger salvageOuttake() {
+    default Trigger salvageOuttakeAngle() {
         return noButton;
     }
-    default Trigger salvageIntake() {
+    default Trigger salvageIntakeAngle() {
+        return noButton;
+    }
+    default Trigger salvageOuttakeRoller() {
+        return noButton;
+    }
+    default Trigger salvageIntakeRoller() {
         return noButton;
     }
 }

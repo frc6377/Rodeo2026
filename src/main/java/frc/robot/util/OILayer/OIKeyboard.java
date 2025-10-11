@@ -71,12 +71,22 @@ public class OIKeyboard implements OI {
     }
 
     @Override
-    public Trigger salvageIntake() {
+    public Trigger salvageIntakeAngle() {
         return V; // Using V button as right bumper
     }
 
     @Override
-    public Trigger salvageOuttake() {
+    public Trigger salvageOuttakeAngle() {
         return C; // Using C button as right trigger
+    }
+
+    @Override
+    public Trigger salvageIntakeRoller() {
+        return M; // Using V button as right bumper
+    }
+
+    @Override
+    public Trigger salvageOuttakeRoller() {
+        return Comma; // Using C button as right trigger
     }
 }

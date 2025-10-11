@@ -118,7 +118,7 @@ public class Salvage extends SubsystemBase {
         return run(() -> salvageIntakeMotor.set(ControlMode.PercentOutput, salvageConstants.IntakeMotorSpeed));
     }
 
-    public Command holdCommand() {
+    public Command rollerCommand() {
         return run(() -> salvageIntakeMotor.set(ControlMode.PercentOutput, 0.1));
     }
 
@@ -153,9 +153,11 @@ public class Salvage extends SubsystemBase {
                 },
                 () -> {
                     goToStowAngle();
-                    holdCommand();
+                    rollerCommand();
                 });
     }
+
+    
 
     public Command outtake() {
         return Commands.startRun(
