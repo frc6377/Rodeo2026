@@ -12,7 +12,7 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
-public class SalvageSim implements SalvageIO {
+public class SalvageSim extends SalvageReal {
     private SingleJointedArmSim armSim;
     private LoggedMechanism2d armMechanism2d;
     private LoggedMechanismRoot2d root;

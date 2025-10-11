@@ -36,8 +36,6 @@ public class Drive extends SubsystemBase {
 
     private final Pigeon2 drivePigeon2;
 
-    private Double targetAngle;
-
     private PIDController pidController;
 
     // Simulation
@@ -63,8 +61,6 @@ public class Drive extends SubsystemBase {
         drivePigeon2 = new Pigeon2(MotorIDs.pigeonID);
         drivePigeon2.setYaw(0);
 
-        targetAngle = drivePigeon2.getYaw().getValueAsDouble();
-
         pidController = new PIDController(DriveConstants.kDriveP, DriveConstants.kDriveI, DriveConstants.kDriveD);
 
         if (Robot.isSimulation()) {
@@ -77,14 +73,14 @@ public class Drive extends SubsystemBase {
                     KitbotWheelSize.kSixInch, // 6" diameter wheels.
                     null // No measurement noise.
                     );
-            m_differentialDrivetrainSim.setPose(new Pose2d(0.0, 4.5, new Rotation2d()));
+            m_differentialDrivetrainSim.setPose(new Pose2d(1.6, 1, new Rotation2d(Math.PI / 2)));
         }
     }
 
     // Getters
     public Trigger isGyroInRange(double target) {
-        return new Trigger(() -> targetAngle - DriveConstants.angleTolerance < getDriveAngleDeg()
-                && getDriveAngleDeg() < targetAngle + DriveConstants.angleTolerance);
+        return new Trigger(() -> target - DriveConstants.angleTolerance < getDriveAngleDeg()
+                && getDriveAngleDeg() < target + DriveConstants.angleTolerance);
     }
 
     // Functions
@@ -135,30 +131,26 @@ public class Drive extends SubsystemBase {
     }
 
     public Command turnCommand(double deg) {
-        targetAngle = getDriveAngleDeg() - deg;
+        double targetAngle = getDriveAngleDeg() - deg;
 
-        return Commands.sequence(
-                        runOnce(() -> {
-                            targetAngle = getDriveAngleDeg() - deg;
-                        }),
-                        new PIDCommand(
-                                pidController,
-                                () -> getDriveAngleDeg(),
-                                () -> {
-                                    return targetAngle;
-                                },
-                                (output) -> {
-                                    SmartDashboard.putNumber("PID Output", output);
-                                    if (Math.abs(output) < DriveConstants.minPower && Math.abs(output) > 0.025) {
-                                        output = Math.copySign(DriveConstants.minPower, output);
-                                        setLeftPercent(-output);
-                                        setRightPercent(output);
-                                    } else {
-                                        setLeftPercent(-output);
-                                        setRightPercent(output);
-                                    }
-                                },
-                                this))
+        return Commands.sequence(new PIDCommand(
+                        pidController,
+                        () -> getDriveAngleDeg(),
+                        () -> {
+                            return targetAngle;
+                        },
+                        (output) -> {
+                            Logger.recordOutput("PID Output", output);
+                            if (Math.abs(output) < DriveConstants.minPower && Math.abs(output) > 0.025) {
+                                output = Math.copySign(DriveConstants.minPower, output);
+                                setLeftPercent(-output);
+                                setRightPercent(output);
+                            } else {
+                                setLeftPercent(-output);
+                                setRightPercent(output);
+                            }
+                        },
+                        this))
                 .until(isGyroInRange(targetAngle).debounce(DriveConstants.debounce))
                 .withName("Turn Command");
     }
@@ -171,7 +163,6 @@ public class Drive extends SubsystemBase {
         Logger.recordOutput("Drive/Right Motor 2", rightDriveMotor2.getMotorOutputPercent());
 
         Logger.recordOutput("Drive/Pigeon Yaw", getDriveAngleDeg());
-        Logger.recordOutput("Drive/Target Angle Auto", targetAngle);
         SmartDashboard.putString(
                 "DriveCommand",
                 getCurrentCommand() != null ? getCurrentCommand().getName() : "No Command");

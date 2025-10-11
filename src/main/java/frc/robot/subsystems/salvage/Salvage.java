@@ -16,7 +16,7 @@ public class Salvage extends SubsystemBase {
 
     public Salvage(SalvageIO io) {
         this.io = io;
-        armPIDController = new PIDController(0.02, 0.0, 0.0);
+        armPIDController = new PIDController(1, 0.0, 0.0);
         armPIDController.setTolerance(2.0);
         armPIDController.enableContinuousInput(0, 360);
     }

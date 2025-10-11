@@ -21,7 +21,7 @@ public class SalvageReal implements SalvageIO {
         salvagePivotEncoder = new CANcoder(SensorIDs.salvagePivotEncoder);
 
         // Configure PID for arm motor
-        armMotor.config_kP(0, 0.02);
+        armMotor.config_kP(0, 1);
         armMotor.config_kI(0, 0.0);
         armMotor.config_kD(0, 0.0);
     }

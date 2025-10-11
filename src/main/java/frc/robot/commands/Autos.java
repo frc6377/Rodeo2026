@@ -12,12 +12,22 @@ import frc.robot.subsystems.scrap.*;
 
 public final class Autos {
     /** Example static factory for an autonomous command. */
+
+    // Go forward (1.5s) turn 45deg go forward (2s) turn -45deg go forward (1s) score salvage
     public static Command LeftScoreAuto(
             Drive driveSubsystem,
             Salvage salvageSubsystem,
             ScrapIntake scrapIntakeSubsystem,
             ScrapShooter scrapShooterSubsystem) {
-        return Commands.sequence()
+        return Commands.sequence(
+                        driveSubsystem.setForwardCommand(1.5, 0.45),
+                        driveSubsystem.turnCommand(45),
+                        driveSubsystem.setForwardCommand(2, 0.45),
+                        driveSubsystem.turnCommand(-45),
+                        driveSubsystem.setForwardCommand(1, 0.45),
+                        salvageSubsystem.moveArmCommand(Salvage.Setpoint.FREIGHT),
+                        salvageSubsystem.holdArmPositionCommand(),
+                        salvageSubsystem.outtakeCommand())
                 .withName("LeftScoreAuto");
     }
 
@@ -26,8 +36,7 @@ public final class Autos {
             Salvage salvageSubsystem,
             ScrapIntake scrapIntakeSubsystem,
             ScrapShooter scrapShooterSubsystem) {
-        return Commands.sequence()
-                .withName("CenterScoreAuto");
+        return Commands.sequence().withName("CenterScoreAuto");
     }
 
     public static Command LeaveDockAuto(
