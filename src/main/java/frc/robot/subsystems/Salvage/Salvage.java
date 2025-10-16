@@ -61,7 +61,7 @@ public class Salvage extends SubsystemBase {
         pivotD = new LoggedNetworkNumber("Salvage/Pivot D", salvageConstants.salvagePivotD);
 
         // Sensors
-        salvagePivotEncoder = new DutyCycleEncoder(Constants.SensorIDs.salvagePivotEncoder);
+        salvagePivotEncoder = new DutyCycleEncoder(Constants.SensorIDs.salvagePivotEncoder, 1, 0.61);
 
         if (tune) {
             salvagePivotPID = new PIDController(
@@ -84,8 +84,8 @@ public class Salvage extends SubsystemBase {
             }
             double output = salvagePivotPID.calculate(getCurrentAngle().in(Degrees));
             salvagePivotLeader.set(ControlMode.PercentOutput, output);
-            
-            if(tune){
+
+            if (tune) {
                 salvagePivotPID.setP(pivotP.get());
                 salvagePivotPID.setI(pivotI.get());
                 salvagePivotPID.setD(pivotD.get());
@@ -156,8 +156,6 @@ public class Salvage extends SubsystemBase {
                     rollerCommand();
                 });
     }
-
-    
 
     public Command outtake() {
         return Commands.startRun(

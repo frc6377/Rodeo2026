@@ -51,7 +51,7 @@ public final class Constants {
     }
 
     public final class SensorIDs {
-        public static final int salvagePivotEncoder = 0; // TODO: FIXIT
+        public static final int salvagePivotEncoder = 9; // TODO: FIXIT
         public static final int pigeonID = 5; // TODO: FIXIT
         public static final int driveRightEncoder = 1; // TODO: FIXIT
         public static final int driveLeftEncoder = 4; // TODO: FIXIT
