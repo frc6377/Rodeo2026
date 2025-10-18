@@ -8,10 +8,12 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix6.hardware.CANcoder;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import frc.robot.Constants.MotorIDs;
 import frc.robot.Constants.SalvageArmConstants;
 import frc.robot.Constants.SensorIDs;
+import org.littletonrobotics.junction.Logger;
 
 public class SalvageReal implements SalvageIO {
     private TalonSRX intakeMotor;
@@ -20,6 +22,7 @@ public class SalvageReal implements SalvageIO {
     private double armSetpoint = 0.0;
 
     private PIDController pid;
+    private ArmFeedforward armFF;
 
     public SalvageReal() {
         intakeMotor = new TalonSRX(MotorIDs.salvageMotor);
@@ -28,6 +31,12 @@ public class SalvageReal implements SalvageIO {
         salvagePivotEncoder = new CANcoder(SensorIDs.salvagePivotEncoder);
 
         pid = new PIDController(1, 0, 2);
+
+        armFF = new ArmFeedforward(
+                SalvageArmConstants.Feedforward.kS,
+                SalvageArmConstants.Feedforward.kG,
+                SalvageArmConstants.Feedforward.kV,
+                0.0); // kA - acceleration feedforward
 
         // Configure PID for arm motor (Talon onboard PID - currently unused)
         armMotor.config_kP(0, SalvageArmConstants.TalonPID.kP);
@@ -52,11 +61,21 @@ public class SalvageReal implements SalvageIO {
         System.out.println("SalvageReal - Encoder: " + inputs.armPositionDegrees + " | Setpoint: " + armSetpoint);
     }
 
+    public double calculateFF() {
+        double ff = armFF.calculate(salvagePivotEncoder.getAbsolutePosition().getValue().in(Degrees), armSetpoint);
+        Logger.recordOutput("Salvage/Feedforward", ff);
+        return ff;
+    }
+
     @Override
     public void setArmPosition(double degrees) {
-        double output = pid.calculate(salvagePivotEncoder.getAbsolutePosition().getValueAsDouble(), degrees);
-        setArmSpeed(output);
         armSetpoint = degrees;
+        double pidOutput = pid.calculate(salvagePivotEncoder.getAbsolutePosition().getValueAsDouble(), degrees);
+        double ffOutput = calculateFF();
+        double totalOutput = pidOutput + ffOutput;
+        setArmSpeed(totalOutput);
+        Logger.recordOutput("Salvage/PIDOutput", pidOutput);
+        Logger.recordOutput("Salvage/TotalOutput", totalOutput);
     }
 
     @Override
