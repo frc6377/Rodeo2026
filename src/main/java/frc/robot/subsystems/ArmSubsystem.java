@@ -1,13 +1,16 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
@@ -27,7 +30,7 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 
 public class ArmSubsystem extends SubsystemBase {
     // Add PIDController calculation to setArmMotor parameter
-    private final TalonSRX m_armMotor;
+    private final VictorSPX m_armMotor;
     private final DutyCycleEncoder m_armEncoder;
 
     private static LoggedMechanism2d mech = new LoggedMechanism2d(2, 2);
@@ -39,11 +42,12 @@ public class ArmSubsystem extends SubsystemBase {
     private SingleJointedArmSim m_armSim;
 
     public ArmSubsystem() {
-        m_armMotor = new TalonSRX(6);
+        m_armMotor = new VictorSPX(8);
         m_armMotor.setNeutralMode(NeutralMode.Brake);
-        m_armEncoder = new DutyCycleEncoder(1, 1.0, .0);
+        m_armMotor.setInverted(InvertType.InvertMotorOutput);
+        m_armEncoder = new DutyCycleEncoder(0, 1.0, .986);
 
-        armPID = new PIDController(1, 0, 0);
+        armPID = new PIDController(.02, 0, 0);
         armFeedforward = new ArmFeedforward(0, 0, 0, 0);
 
         if (Robot.isSimulation()) {
@@ -52,7 +56,8 @@ public class ArmSubsystem extends SubsystemBase {
             m_armSim = new SingleJointedArmSim(
                     armConstants.kArmGearbox,
                     armConstants.kArmGearing,
-                    SingleJointedArmSim.estimateMOI(armConstants.armLength.in(Meters), 0.2),
+                    SingleJointedArmSim.estimateMOI(
+                            armConstants.armLength.in(Meters), Pounds.of(10).in(Kilograms)),
                     armConstants.armLength.in(Meters),
                     armConstants.armMinAngle.in(Radians),
                     armConstants.armMaxAngle.in(Radians),
@@ -65,16 +70,12 @@ public class ArmSubsystem extends SubsystemBase {
         }
     }
 
-    public Command scoreScrapCommand() {
+    public Command scoreSalvageCommand() {
         return setArmCommand(Degrees.of(45));
     }
 
-    public Command scoreSalvageCommand() {
-        return setArmCommand(Degrees.of(20));
-    }
-
     public Command floorPickupCommand() {
-        return setArmCommand(Degrees.of(-5));
+        return setArmCommand(Degrees.of(0.01));
     }
 
     public void setArmPercent(double percent) {
@@ -82,9 +83,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public Angle getArmAngle() {
-        return Robot.isSimulation()
-                ? Radians.of(m_armEncoderSim.get())
-                : Rotations.of(m_armEncoder.get());
+        return Robot.isSimulation() ? Radians.of(m_armEncoderSim.get()) : Rotations.of(m_armEncoder.get());
     }
 
     public Command setArmCommand(Angle target) {
@@ -108,10 +107,11 @@ public class ArmSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         Logger.recordOutput(
-                "Arm Subsystem command",
+                "Arm/Arm Subsystem command",
                 getCurrentCommand() == null ? "null" : getCurrentCommand().getName());
-        Logger.recordOutput("Motor Output", m_armMotor.getMotorOutputPercent());
-        Logger.recordOutput("Motor Voltage", m_armMotor.getMotorOutputVoltage());
+        Logger.recordOutput("Arm/Motor Output", m_armMotor.getMotorOutputPercent());
+        Logger.recordOutput("Arm/Motor Voltage", m_armMotor.getMotorOutputVoltage());
+        Logger.recordOutput("Arm/Encoder Degrees", m_armEncoder.get());
     }
 
     public void simulationPeriodic() {

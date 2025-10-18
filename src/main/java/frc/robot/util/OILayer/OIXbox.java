@@ -10,6 +10,7 @@ public class OIXbox implements OI {
     private static final double triggerThreshold = 0.5;
 
     private static final XboxController controller = new XboxController(0);
+    public static final ControlCurve controlCurve = new ControlCurve(1, 2, 0.1);
 
     // Face Buttons
     public static final Trigger a = new JoystickButton(controller, XboxController.Button.kA.value);
@@ -51,17 +52,17 @@ public class OIXbox implements OI {
 
     @Override
     public DoubleSupplier driveTranslationX() {
-        return leftX;
+        return () -> controlCurve.calculate(leftX.getAsDouble());
     }
 
     @Override
     public DoubleSupplier driveTranslationY() {
-        return leftY;
+        return () -> controlCurve.calculate(leftY.getAsDouble());
     }
 
     @Override
     public DoubleSupplier driveRotation() {
-        return rightX;
+        return () -> controlCurve.calculate(rightX.getAsDouble());
     }
 
     @Override

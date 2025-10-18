@@ -74,7 +74,11 @@ public class RobotContainer {
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", new SendableChooser<Command>());
 
         // Set up SysId routines
-        autoChooser.addOption("Example Auto", Commands.none());
+        autoChooser.addOption("Test Auto", drive.setForwardCommand(2, .7));
+        // .andThen(armSubsystem.floorPickupCommand())
+        // .until(() -> armSubsystem.getArmAngle().in(Rotations) < .1)
+        // .andThen(intakeSubsystem.setIntakeCommand(1.5, .6))
+        // .andThen(drive.setTurnCommand(.5, .5)));
 
         // Configure the button bindings
         configureButtonBindings();
@@ -87,12 +91,11 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         // Default command, normal field-relative drive
-        drive.setDefaultCommand(drive.driveCommand(controller.driveTranslationY(), controller.driveTranslationX()));
+        drive.setDefaultCommand(drive.driveCommand(controller.driveTranslationY(), controller.driveRotation()));
 
         // intaking commands
-        m_driverController.a().whileTrue(armSubsystem.floorPickupCommand());
-        m_driverController.b().whileTrue(armSubsystem.scoreSalvageCommand());
-        m_driverController.x().whileTrue(armSubsystem.scoreScrapCommand());
+        m_driverController.a().onTrue(armSubsystem.floorPickupCommand());
+        m_driverController.b().onTrue(armSubsystem.scoreSalvageCommand());
         intakeSubsystem.setDefaultCommand(intakeSubsystem.intakeCommand(
                 m_driverController::getLeftTriggerAxis, m_driverController::getRightTriggerAxis));
 

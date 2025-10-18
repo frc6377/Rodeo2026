@@ -13,7 +13,7 @@ public class DriveConstants {
 
     public static final double minTurnSpeed = 0.1;
 
-    public static final double maxDrivePercent = 0.5;
+    public static final double maxDrivePercent = 1;
     public static final double maxTurnPercent = 0.5;
 
     public static final double angleTolerance = 2;
