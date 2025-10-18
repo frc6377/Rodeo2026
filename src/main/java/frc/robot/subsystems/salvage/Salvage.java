@@ -120,7 +120,7 @@ public class Salvage extends SubsystemBase {
         }
     }
 
-    public Command moveArmCommand(Setpoint setpoint, boolean force) {
+    public Command moveArmCommand(Setpoint setpoint) {
         // Determine which setpoint we're closer to
         targetSetpoint = setpoint; // Update target setpoint for default command
         double currentAngle = getCurrentAngle().in(Degrees);
@@ -131,10 +131,6 @@ public class Salvage extends SubsystemBase {
         double distanceToFreight = Math.abs(currentAngle - freightAngle);
 
         Setpoint closerSetpoint = distanceToIntake < distanceToFreight ? Setpoint.INTAKE : Setpoint.FREIGHT;
-
-        if (!force && closerSetpoint == setpoint && distanceToIntake < SalvageArmConstants.PID.tolerance) {
-            return Commands.none();
-        }
 
         return toggleArmPositionCommand();
     } 
@@ -161,7 +157,6 @@ public class Salvage extends SubsystemBase {
 
                     targetSetpoint = distanceToIntake < distanceToFreight ? Setpoint.INTAKE : Setpoint.FREIGHT;
 
-                    
                 })
                 .withName("Toggle Salvage Arm");
     }

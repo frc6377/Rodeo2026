@@ -47,9 +47,6 @@ public class SalvageReal implements SalvageIO {
     @Override
     public void setArmPosition(double degrees) {
         armSetpoint = degrees;
-        // Note: Using manual control instead of Talon PID
-        // The actual PID control should be handled in the subsystem layer
-        // This is just storing the setpoint for reference
     }
 
     @Override
@@ -59,7 +56,6 @@ public class SalvageReal implements SalvageIO {
 
     @Override
     public void setArmSpeed(double degreesPerSec) {
-        
     }
 
     @Override

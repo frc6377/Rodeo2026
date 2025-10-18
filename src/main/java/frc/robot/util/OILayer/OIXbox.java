@@ -87,11 +87,6 @@ public class OIXbox implements OI {
     }
 
     @Override
-    public Trigger salvageScore() {
-        return rightTriggerAsButton;
-    }
-
-    @Override
     public Trigger runShooterBeltSlow() {
         return a;
     }
@@ -107,7 +102,17 @@ public class OIXbox implements OI {
     }
 
     @Override
-    public Trigger salvageIntake() {
+    public Trigger salvageToggle() {
         return x;
+    }
+
+    @Override
+    public Trigger salvageIntake() {
+        return rightTriggerAsButton;
+    }
+
+    @Override
+    public Trigger salvageOuttake() {
+        return leftTriggerAsButton;
     }
 }
