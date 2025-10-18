@@ -4,7 +4,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.ScrapArmConstants;
 
 public class ScrapIntake extends SubsystemBase {
     private final ScrapIntakeIO io;
@@ -30,11 +29,9 @@ public class ScrapIntake extends SubsystemBase {
     public Command intake() {
         return runEnd(
                         () -> {
-                            io.setArmSetpoint(ScrapArmConstants.kArmIntakeAngle);
                             io.setRollerSpeed(300);
                         },
                         () -> {
-                            io.setArmSetpoint(ScrapArmConstants.kArmStowAngle);
                             io.setRollerSpeed(0);
                         })
                 .withName("ScrapIntake");
