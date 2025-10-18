@@ -12,7 +12,7 @@ public class OIXbox implements OI {
     private static final XboxController controller = new XboxController(0);
 
     private static final ControlCurve driveForwardCurve = new ControlCurve(1, 2, 0.1, true);
-    private static final ControlCurve driveRotationCurve = new ControlCurve(1, 1, 0.15, true);
+    private static final ControlCurve driveRotationCurve = new ControlCurve(1, 4, 0.08, false);
 
     // Face Buttons
     public static final Trigger a = new JoystickButton(controller, XboxController.Button.kA.value);

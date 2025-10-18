@@ -46,7 +46,7 @@ public final class Constants {
         public static final int rightDriveFollower = 19;
 
         public static final int salvagePivotLeader = 5;
-        public static final int salvageIntakeMotor = 2;
+        public static final int salvageIntakeMotor = 8;
     }
 
     public final class SensorIDs {
@@ -63,13 +63,13 @@ public final class Constants {
         public static final double salvagePivotD = 0.0;
         // Angles
         public static final Angle SalvagePivotMinAngle = Degrees.of(0); // TODO: FIXIT
-        public static final Angle SalvagePivotMaxAngle = Degrees.of(290); // degrees
+        public static final Angle SalvagePivotMaxAngle = Degrees.of(260); // degrees
         public static final Angle SalvagePivotTolerance = Degrees.of(2); // degrees
-        public static final Angle SalvagePivotInitialAngle = Degrees.of(3.9); // degrees
+        public static final Angle SalvagePivotInitialAngle = Degrees.of(14.4); // degrees
         public static final Angle SalvagePivotPickupAngle = Degrees.of(260); // degrees
         public static final Angle SalvagePivotStowAngle = Degrees.of(0); // degrees
-        public static final Angle SalvagePivotScoreAngle = Degrees.of(250); // degrees
-        public static final Angle SalvagePivotUpAngle = Degrees.of(132); // degrees
+        public static final Angle SalvagePivotScoreAngle = Degrees.of(230); // degrees
+        public static final Angle SalvagePivotUpAngle = Degrees.of(137); // degrees
         // Speeds
         public static final double IntakeMotorSpeed = 0.7;
         public static final double OuttakeMotorSpeed = -0.7;

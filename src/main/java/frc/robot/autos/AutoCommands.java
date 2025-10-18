@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Drive.Drive;
 import frc.robot.subsystems.Salvage.Salvage;
+import frc.robot.subsystems.Salvage.SalvageRoller;
 
 public final class AutoCommands {
     /** Example static factory for an autonomous command. */
@@ -31,10 +32,6 @@ public final class AutoCommands {
         return arm.setAngle(angle);
     }
 
-    public static Command setSalvageRoller(Salvage roller, Time time) {
-        return roller.intakeCommand().withTimeout(time.in(Seconds));
-    }
-
     public static Command intakeSalvageArm(Salvage arm) {
         return arm.goToPickupAngle();
     }
@@ -45,5 +42,11 @@ public final class AutoCommands {
 
     private AutoCommands() {
         throw new UnsupportedOperationException("This is a utility class!");
+    }
+
+    public static Command setSalvageRoller(SalvageRoller salvage, Time time) {
+        return Commands.sequence(salvage.intakeCommand())
+                .withTimeout(time.in(Seconds))
+                .withName("setSalvageRoller");
     }
 }

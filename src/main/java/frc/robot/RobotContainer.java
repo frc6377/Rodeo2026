@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.autos.Autos;
 import frc.robot.subsystems.Drive.Drive;
 import frc.robot.subsystems.Salvage.Salvage;
+import frc.robot.subsystems.Salvage.SalvageRoller;
 import frc.robot.util.OILayer.OI;
 import frc.robot.util.OILayer.OIKeyboard;
 import frc.robot.util.OILayer.OIXbox;
@@ -38,6 +39,7 @@ public class RobotContainer {
     // Subsystems
     private final Drive drive;
     private final Salvage salvage;
+    private final SalvageRoller roller;
 
     // Controller
     public final OI controller =
@@ -53,17 +55,20 @@ public class RobotContainer {
                 // Real robot, instantiate hardware IO implementations
                 drive = new Drive();
                 salvage = new Salvage();
+                roller = new SalvageRoller();
                 break;
             case SIM:
                 // Sim robot, instantiate physics sim IO implementations
                 drive = new Drive();
                 salvage = new Salvage();
+                roller = new SalvageRoller();
                 break;
 
             default:
                 // Replayed robot, disable IO implementations
                 drive = new Drive();
                 salvage = new Salvage();
+                roller = new SalvageRoller();
                 break;
         }
 
@@ -78,8 +83,6 @@ public class RobotContainer {
     private void addAutoCommands() {
         autoChooser.addOption("Do Nothing", Commands.none());
         autoChooser.addOption("Drive and Turn", Autos.driveAndTurn(drive));
-        autoChooser.addOption("Pickup and Score", Autos.pickupAndScore(salvage));
-        autoChooser.addOption("One Salvage Middle", Autos.oneSalvageMiddle(salvage, drive));
     }
 
     public double getAxis() {
@@ -100,8 +103,8 @@ public class RobotContainer {
         controller.zeroDrivebase().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
         // Salvage Control
-        controller.salvageIntakeRoller().whileTrue(salvage.intakeCommand());
-        controller.salvageOuttakeRoller().whileTrue(salvage.outtakeCommand());
+        controller.salvageIntakeRoller().whileTrue(roller.intakeCommand());
+        controller.salvageOuttakeRoller().whileTrue(roller.outtakeCommand());
         controller.salvageIntakeAngle().whileTrue(salvage.goToPickupAngle());
         controller.salvageOuttakeAngle().whileTrue(salvage.goToScoreAngle());
         controller.initialAngle().onTrue(salvage.goToInitialAngle());

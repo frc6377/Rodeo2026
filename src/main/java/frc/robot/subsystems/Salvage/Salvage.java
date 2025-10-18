@@ -26,7 +26,6 @@ public class Salvage extends SubsystemBase {
     // Motors
     private final TalonSRX salvagePivotLeader;
 
-    private final TalonSRX salvageIntakeMotor;
     private final DutyCycleEncoder salvagePivotEncoder;
 
     private final LoggedNetworkNumber pivotP;
@@ -44,10 +43,6 @@ public class Salvage extends SubsystemBase {
         // Pivot Leader Motor
         salvagePivotLeader = new TalonSRX(Constants.MotorIDs.salvagePivotLeader);
         salvagePivotLeader.setInverted(false);
-
-        // Intake Motor
-        salvageIntakeMotor = new TalonSRX(Constants.MotorIDs.salvageIntakeMotor);
-        salvageIntakeMotor.setInverted(false);
 
         // Tunable PID
         pivotP = new LoggedNetworkNumber("Salvage/Pivot P", salvageConstants.salvagePivotP);
@@ -91,7 +86,6 @@ public class Salvage extends SubsystemBase {
             Logger.recordOutput("Salvage/Pivot Angle", getCurrentAngle().in(Degrees));
             Logger.recordOutput("Salvage/Pivot Leader Output", salvagePivotLeader.getMotorOutputPercent());
             Logger.recordOutput("Salvage/Pivot At Setpoint", salvagePivotPID.atSetpoint());
-            Logger.recordOutput("Salvage/Intake Motor Output", salvageIntakeMotor.getMotorOutputPercent());
         });
     }
 
@@ -105,25 +99,6 @@ public class Salvage extends SubsystemBase {
                     salvageConstants.SalvagePivotMinAngle.in(Degrees),
                     Math.min(salvageConstants.SalvagePivotMaxAngle.in(Degrees), angle.in(Degrees)));
             salvagePivotPID.setSetpoint(clampedAngle);
-        });
-    }
-
-    public Command intakeCommand() {
-        return run(() -> salvageIntakeMotor.set(ControlMode.PercentOutput, salvageConstants.IntakeMotorSpeed));
-    }
-
-    public Command rollerCommand() {
-        return run(() -> salvageIntakeMotor.set(ControlMode.PercentOutput, 0.1));
-    }
-
-    public Command outtakeCommand() {
-        return run(() -> salvageIntakeMotor.set(ControlMode.PercentOutput, -salvageConstants.IntakeMotorSpeed));
-    }
-
-    public Command stopAll() {
-        return Commands.runOnce(() -> {
-            salvageIntakeMotor.set(ControlMode.PercentOutput, 0);
-            salvagePivotLeader.set(ControlMode.PercentOutput, 0);
         });
     }
 
@@ -143,29 +118,6 @@ public class Salvage extends SubsystemBase {
         return setAngle(salvageConstants.SalvagePivotInitialAngle);
     }
 
-    public Command intake() {
-        return Commands.startEnd(
-                () -> {
-                    goToPickupAngle();
-                    intakeCommand();
-                },
-                () -> {
-                    goToStowAngle();
-                    rollerCommand();
-                });
-    }
-
-    public Command outtake() {
-        return Commands.startRun(
-                () -> {
-                    goToScoreAngle();
-                    outtakeCommand();
-                },
-                () -> {
-                    goToStowAngle();
-                });
-    }
-
     @Override
     public void periodic() {
         if (Robot.isReal()) {
@@ -177,6 +129,8 @@ public class Salvage extends SubsystemBase {
         Logger.recordOutput("Salvage/Pivot Angle", getCurrentAngle().in(Degrees));
         Logger.recordOutput("Salvage/Pivot Leader Output", salvagePivotLeader.getMotorOutputPercent());
         Logger.recordOutput("Salvage/Pivot At Setpoint", salvagePivotPID.atSetpoint());
-        Logger.recordOutput("Salvage/Intake Motor Output", salvageIntakeMotor.getMotorOutputPercent());
+        Logger.recordOutput(
+                "Salvage/Current Command",
+                this.getCurrentCommand() != null ? this.getCurrentCommand().getName() : "No Command");
     }
 }
