@@ -45,9 +45,8 @@ public final class Constants {
         public static final int rightDriveLeader = 4;
         public static final int rightDriveFollower = 19;
 
-        public static final int salvagePivotLeader = 6;
-        public static final int salvagePivotFollower = 9;
-        public static final int salvageIntakeMotor = 7;
+        public static final int salvagePivotLeader = 5;
+        public static final int salvageIntakeMotor = 2;
     }
 
     public final class SensorIDs {
@@ -59,18 +58,18 @@ public final class Constants {
 
     public static class salvageConstants {
         // PID
-        public static final double salvagePivotP = 1.0; // TODO: FIXIT
+        public static final double salvagePivotP = 0.005; // TODO: FIXIT
         public static final double salvagePivotI = 0.0;
         public static final double salvagePivotD = 0.0;
         // Angles
         public static final Angle SalvagePivotMinAngle = Degrees.of(0); // TODO: FIXIT
-        public static final Angle SalvagePivotMaxAngle = Degrees.of(200); // degrees
+        public static final Angle SalvagePivotMaxAngle = Degrees.of(290); // degrees
         public static final Angle SalvagePivotTolerance = Degrees.of(2); // degrees
-        public static final Angle SalvagePivotInitialAngle = Degrees.of(0); // degrees
-        public static final Angle SalvagePivotPickupAngle = Degrees.of(0); // degrees
+        public static final Angle SalvagePivotInitialAngle = Degrees.of(3.9); // degrees
+        public static final Angle SalvagePivotPickupAngle = Degrees.of(260); // degrees
         public static final Angle SalvagePivotStowAngle = Degrees.of(0); // degrees
-        public static final Angle SalvagePivotScoreAngle = Degrees.of(0); // degrees
-        public static final Angle SalvagePivotUpAngle = Degrees.of(0); // degrees
+        public static final Angle SalvagePivotScoreAngle = Degrees.of(250); // degrees
+        public static final Angle SalvagePivotUpAngle = Degrees.of(132); // degrees
         // Speeds
         public static final double IntakeMotorSpeed = 0.7;
         public static final double OuttakeMotorSpeed = -0.7;

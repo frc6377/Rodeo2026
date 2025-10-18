@@ -55,12 +55,12 @@ public class OIXbox implements OI {
 
     @Override
     public DoubleSupplier driveTranslationY() {
-        return () -> driveForwardCurve.calculate(leftY.getAsDouble());
+        return () -> -driveForwardCurve.calculate(leftY.getAsDouble());
     }
 
     @Override
     public DoubleSupplier driveRotation() {
-        return () -> driveRotationCurve.calculate(rightX.getAsDouble());
+        return () -> -driveRotationCurve.calculate(rightX.getAsDouble());
     }
 
     @Override
@@ -86,5 +86,9 @@ public class OIXbox implements OI {
     @Override
     public Trigger salvageIntakeRoller() {
         return leftTriggerAsButton;
+    }
+
+    public Trigger initialAngle() {
+        return a;
     }
 }

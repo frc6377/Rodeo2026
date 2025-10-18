@@ -7,7 +7,6 @@ package frc.robot.subsystems.Salvage;
 import static edu.wpi.first.units.Units.Degrees;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
@@ -27,8 +26,6 @@ public class Salvage extends SubsystemBase {
     // Motors
     private final TalonSRX salvagePivotLeader;
 
-    private final TalonSRX salvagePivotFollower;
-
     private final TalonSRX salvageIntakeMotor;
     private final DutyCycleEncoder salvagePivotEncoder;
 
@@ -38,6 +35,8 @@ public class Salvage extends SubsystemBase {
 
     private final boolean tune = true;
 
+    public static double resetValue = 0.61;
+
     // Sensors
     private final PIDController salvagePivotPID;
 
@@ -45,11 +44,6 @@ public class Salvage extends SubsystemBase {
         // Pivot Leader Motor
         salvagePivotLeader = new TalonSRX(Constants.MotorIDs.salvagePivotLeader);
         salvagePivotLeader.setInverted(false);
-
-        // Pivot Follower Motor
-        salvagePivotFollower = new TalonSRX(Constants.MotorIDs.salvagePivotFollower);
-        salvagePivotFollower.setInverted(InvertType.FollowMaster);
-        salvagePivotFollower.follow(salvagePivotLeader);
 
         // Intake Motor
         salvageIntakeMotor = new TalonSRX(Constants.MotorIDs.salvageIntakeMotor);
@@ -61,7 +55,7 @@ public class Salvage extends SubsystemBase {
         pivotD = new LoggedNetworkNumber("Salvage/Pivot D", salvageConstants.salvagePivotD);
 
         // Sensors
-        salvagePivotEncoder = new DutyCycleEncoder(Constants.SensorIDs.salvagePivotEncoder, 1, 0.61);
+        salvagePivotEncoder = new DutyCycleEncoder(Constants.SensorIDs.salvagePivotEncoder, 1, 0.6);
 
         if (tune) {
             salvagePivotPID = new PIDController(
@@ -71,6 +65,7 @@ public class Salvage extends SubsystemBase {
         }
 
         salvagePivotPID.setTolerance(salvageConstants.SalvagePivotTolerance.in(Degrees));
+        salvagePivotPID.setSetpoint(Constants.salvageConstants.SalvagePivotInitialAngle.in(Degrees));
     }
 
     public Command update() {
@@ -95,7 +90,6 @@ public class Salvage extends SubsystemBase {
             Logger.recordOutput("Salvage/Pivot Setpoint", salvagePivotPID.getSetpoint());
             Logger.recordOutput("Salvage/Pivot Angle", getCurrentAngle().in(Degrees));
             Logger.recordOutput("Salvage/Pivot Leader Output", salvagePivotLeader.getMotorOutputPercent());
-            Logger.recordOutput("Salvage/Pivot Follower Output", salvagePivotFollower.getMotorOutputPercent());
             Logger.recordOutput("Salvage/Pivot At Setpoint", salvagePivotPID.atSetpoint());
             Logger.recordOutput("Salvage/Intake Motor Output", salvageIntakeMotor.getMotorOutputPercent());
         });
@@ -145,6 +139,10 @@ public class Salvage extends SubsystemBase {
         return setAngle(salvageConstants.SalvagePivotScoreAngle);
     }
 
+    public Command goToInitialAngle() {
+        return setAngle(salvageConstants.SalvagePivotInitialAngle);
+    }
+
     public Command intake() {
         return Commands.startEnd(
                 () -> {
@@ -178,7 +176,6 @@ public class Salvage extends SubsystemBase {
         Logger.recordOutput("Salvage/Pivot Setpoint", salvagePivotPID.getSetpoint());
         Logger.recordOutput("Salvage/Pivot Angle", getCurrentAngle().in(Degrees));
         Logger.recordOutput("Salvage/Pivot Leader Output", salvagePivotLeader.getMotorOutputPercent());
-        Logger.recordOutput("Salvage/Pivot Follower Output", salvagePivotFollower.getMotorOutputPercent());
         Logger.recordOutput("Salvage/Pivot At Setpoint", salvagePivotPID.atSetpoint());
         Logger.recordOutput("Salvage/Intake Motor Output", salvageIntakeMotor.getMotorOutputPercent());
     }

@@ -89,4 +89,8 @@ public class OIKeyboard implements OI {
     public Trigger salvageOuttakeRoller() {
         return Comma; // Using C button as right trigger
     }
+
+    public Trigger initialAngle() {
+        return Slash;
+    }
 }

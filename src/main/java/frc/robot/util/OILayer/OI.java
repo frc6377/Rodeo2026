@@ -41,4 +41,8 @@ public interface OI {
     default Trigger salvageIntakeRoller() {
         return noButton;
     }
+
+    default Trigger initialAngle() {
+        return noButton;
+    }
 }

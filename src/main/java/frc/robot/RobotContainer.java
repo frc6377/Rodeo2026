@@ -104,6 +104,7 @@ public class RobotContainer {
         controller.salvageOuttakeRoller().whileTrue(salvage.outtakeCommand());
         controller.salvageIntakeAngle().whileTrue(salvage.goToPickupAngle());
         controller.salvageOuttakeAngle().whileTrue(salvage.goToScoreAngle());
+        controller.initialAngle().onTrue(salvage.goToInitialAngle());
     }
 
     /**
