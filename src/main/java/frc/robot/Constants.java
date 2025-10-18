@@ -89,7 +89,7 @@ public final class Constants {
         public static final int pigeonID = 9;
 
         // Scrap Motors IDs
-        public static final int intakeMotorID = 6;
+        public static final int intakeMotorID = 67;
         public static final int pivotMotorID = 7;
         public static final int pivotEncoderID = 5;
         public static final int shooterMotor1ID = 20; // 10;

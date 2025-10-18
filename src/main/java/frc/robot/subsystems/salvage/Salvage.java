@@ -125,7 +125,7 @@ public class Salvage extends SubsystemBase {
         }
     }
 
-    public Command moveArmCommand(Setpoint setpoint) {
+    public Command moveArmCommand(Setpoint setpoint, boolean force) {
         // Determine which setpoint we're closer to
         targetSetpoint = setpoint; // Update target setpoint for default command
         double currentAngle = getCurrentAngle().in(Degrees);
@@ -137,12 +137,12 @@ public class Salvage extends SubsystemBase {
 
         Setpoint closerSetpoint = distanceToIntake < distanceToFreight ? Setpoint.INTAKE : Setpoint.FREIGHT;
 
-        if (closerSetpoint == setpoint && distanceToIntake < SalvageArmConstants.PID.tolerance) {
+        if (!force && closerSetpoint == setpoint && distanceToIntake < SalvageArmConstants.PID.tolerance) {
             return Commands.none();
         }
 
         return toggleArmPositionCommand();
-    }
+    } 
 
     /**
      * Toggle between INTAKE (0°) and FREIGHT (43.75°) Simple: just toggle the state variable and the default command
@@ -157,11 +157,16 @@ public class Salvage extends SubsystemBase {
                         targetSetpoint = Setpoint.INTAKE;
                     }
 
-                    System.out.println("============================================");
-                    System.out.println("TOGGLED TO: " + targetSetpoint.name() + " ("
-                            + targetSetpoint.getAngle().in(Degrees) + "°)");
-                    System.out.println("CURRENT ANGLE: " + getCurrentAngle().in(Degrees) + "°");
-                    System.out.println("============================================");
+                    double currentAngle = getCurrentAngle().in(Degrees);
+                    double intakeAngle = Setpoint.INTAKE.getAngle().in(Degrees);
+                    double freightAngle = Setpoint.FREIGHT.getAngle().in(Degrees);
+
+                    double distanceToIntake = Math.abs(currentAngle - intakeAngle);
+                    double distanceToFreight = Math.abs(currentAngle - freightAngle);
+
+                    targetSetpoint = distanceToIntake < distanceToFreight ? Setpoint.INTAKE : Setpoint.FREIGHT;
+
+                    
                 })
                 .withName("Toggle Salvage Arm");
     }

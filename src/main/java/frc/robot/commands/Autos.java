@@ -13,7 +13,7 @@ import frc.robot.subsystems.scrap.*;
 public final class Autos {
 
     public static Command dropToZero(Salvage salvageSubsystem) {
-        return salvageSubsystem.moveArmCommand(Salvage.Setpoint.INTAKE);
+        return salvageSubsystem.moveArmCommand(Salvage.Setpoint.INTAKE, true);
     }
 
     // Go forward (1.5s) turn 45deg go forward (2s) turn -45deg go forward (1s) score salvage

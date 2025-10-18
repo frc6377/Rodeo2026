@@ -58,6 +58,11 @@ public class SalvageReal implements SalvageIO {
     }
 
     @Override
+    public void setArmSpeed(double degreesPerSec) {
+        
+    }
+
+    @Override
     public void setIntakeSpeed(double speed) {
         intakeMotor.set(ControlMode.PercentOutput, speed);
     }
