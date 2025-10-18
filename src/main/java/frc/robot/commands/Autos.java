@@ -54,10 +54,14 @@ public final class Autos {
     }
 
     public static Command LeaveDockAuto(
-            Drive driveSubsystem, Salvage salvageSubsystem, ScrapIntake scrapIntakeSubsystem) {
-        // ScrapShooter scrapShooterSubsystem) {
-        return Commands.sequence(dropToZero(salvageSubsystem), driveSubsystem.setForwardCommand(1.5, 0.45))
-                .withName("LeaveDockAuto");
+            Drive driveSubsystem,
+            Salvage salvageSubsystem,
+            ScrapIntake scrapIntakeSubsystem,
+            ScrapShooter scrapShooterSubsystem) {
+        return Commands.sequence(
+            dropToZero(salvageSubsystem),
+            driveSubsystem.setForwardCommand(1.5, 0.45))
+        .withName("LeaveDockAuto");
     }
 
     public static Command ShootScrapAuto(
