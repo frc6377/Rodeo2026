@@ -94,7 +94,6 @@ public class RobotContainer {
         autoChooser.addOption(auto2.getName(), auto2);
 
         Command auto3 = Autos.LeaveDockAuto(drive, salvage, scrapIntake, null);
-        Command auto3 = Autos.LeaveDockAuto(drive, salvage, scrapIntake, null);
         autoChooser.addOption(auto3.getName(), auto3);
 
         Command auto4 = Autos.ShootScrapAuto(drive, salvage, scrapIntake);
