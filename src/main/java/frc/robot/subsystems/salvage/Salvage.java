@@ -106,7 +106,8 @@ public class Salvage extends SubsystemBase {
     // 2 setpoints: intake, freight
     public enum Setpoint {
         INTAKE(SalvageArmConstants.kArmIntakeAngle),
-        FREIGHT(SalvageArmConstants.kArmFreightAngle);
+        FREIGHT(SalvageArmConstants.kArmFreightAngle),
+        ZERO(Degrees.of(0));
 
         private final Angle angle;
 

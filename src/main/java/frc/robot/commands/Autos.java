@@ -11,6 +11,11 @@ import frc.robot.subsystems.salvage.*;
 import frc.robot.subsystems.scrap.*;
 
 public final class Autos {
+
+    public static Command dropToZero(Salvage salvageSubsystem) {
+        return salvageSubsystem.moveArmCommand(Salvage.Setpoint.ZERO);
+    }
+
     // Go forward (1.5s) turn 45deg go forward (2s) turn -45deg go forward (1s) score salvage
     public static Command LeftScoreAuto(
             Drive driveSubsystem,
@@ -20,6 +25,7 @@ public final class Autos {
         int turnDegrees = 30;
         double scaler = 1;
         return Commands.sequence(
+                        dropToZero(salvageSubsystem),
                         driveSubsystem.setForwardCommand(2.5 * scaler, 0.45),
                         driveSubsystem.turnCommand(turnDegrees).withTimeout(2),
                         driveSubsystem.setForwardCommand(4 * scaler, 0.45),
