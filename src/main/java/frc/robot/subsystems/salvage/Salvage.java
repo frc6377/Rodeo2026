@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SalvageArmConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class Salvage extends SubsystemBase {
     private final SalvageIO io;
@@ -35,6 +36,10 @@ public class Salvage extends SubsystemBase {
         SmartDashboard.putNumber("Salvage/Arm Current", inputs.armCurrentAmps);
         SmartDashboard.putNumber("Salvage/Intake Current", inputs.intakeCurrentAmps);
         SmartDashboard.putBoolean("Salvage/At Setpoint", inputs.atSetpoint);
+
+        Logger.recordOutput(
+                "Salvage/Current Command",
+                getCurrentCommand() != null ? getCurrentCommand().getName() : "No command");
 
         // Always apply gravity compensation to prevent arm from falling
         // Commands will add their own control output on top of this
