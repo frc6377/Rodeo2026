@@ -46,14 +46,14 @@ public class Drive extends SubsystemBase {
     /** Creates a new ExampleSubsystem. */
     public Drive() {
         leftDriveMotor1 = new TalonSRX(MotorIDs.leftDriveMotor1);
-        leftDriveMotor1.setInverted(true);
+        leftDriveMotor1.setInverted(false);
 
         leftDriveMotor2 = new TalonSRX(MotorIDs.leftDriveMotor2);
         leftDriveMotor2.follow(leftDriveMotor1);
         leftDriveMotor2.setInverted(InvertType.FollowMaster);
 
         rightDriveMotor1 = new TalonSRX(MotorIDs.rightDriveMotor1);
-        rightDriveMotor1.setInverted(true);
+        rightDriveMotor1.setInverted(false);
 
         rightDriveMotor2 = new TalonSRX(MotorIDs.rightDriveMotor2);
 
