@@ -82,13 +82,7 @@ public class Salvage extends SubsystemBase {
                             double intakeAngle = Setpoint.INTAKE.getAngle().in(Degrees);
                             double freightAngle = Setpoint.FREIGHT.getAngle().in(Degrees);
 
-                            // Determine target angle: if at intake, move to freight; otherwise stay at current angle
-                            double targetAngle;
-                            if (Math.abs(currentAngle - intakeAngle) < SalvageArmConstants.PID.tolerance) {
-                                targetAngle = freightAngle;
-                            } else {
-                                targetAngle = currentAngle; // Hold current position
-                            }
+                            moveArmCommand(Setpoint.FREIGHT).execute();
 
                             double pidOutput = armPIDController.calculate(currentAngle, targetAngle);
                             double feedforward = calculateFeedforward(currentAngle);
@@ -102,6 +96,21 @@ public class Salvage extends SubsystemBase {
                         this)
                 .withName("SalvageScore");
     }
+
+    public Command salvageIntake() {
+        return Commands.runEnd(
+                        () -> {
+                            moveArmCommand(Setpoint.INTAKE).execute();
+                            holdSetpointCommand().execute();
+                            io.setIntakeSpeed(1.0); // Positive for intake
+                        },
+                        () -> {
+                            // When button released: stop roller, hold arm position
+                            io.stopIntake();
+                        },
+                        this)
+                .withName("SalvageIntake");
+    }    
 
     // 2 setpoints: intake, freight
     public enum Setpoint {
