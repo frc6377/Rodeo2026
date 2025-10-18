@@ -69,21 +69,36 @@ public class OIXbox implements OI {
 
     @Override
     public Trigger shooterOuttake() {
-        return rightBumper;
-    }
-
-    @Override
-    public Trigger shooterIntake() {
         return leftBumper;
     }
 
     @Override
     public Trigger scrapIntake() {
-        return a;
+        return rightBumper;
     }
 
     @Override
     public Trigger salvageScore() {
         return rightTriggerAsButton;
+    }
+
+    @Override
+    public Trigger runShooterBeltSlow() {
+        return a;
+    }
+
+    @Override
+    public Trigger pivotSalvageUp() {
+        return rightBumper;
+    }
+
+    @Override
+    public Trigger pivotSalvageDown() {
+        return leftBumper;
+    }
+
+    @Override
+    public Trigger salvageIntake() {
+        return x;
     }
 }

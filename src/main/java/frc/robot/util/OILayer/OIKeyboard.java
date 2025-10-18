@@ -83,7 +83,7 @@ public class OIKeyboard implements OI {
     }
 
     @Override
-    public Trigger pivotDown() {
+    public Trigger pivotSalvageDown() {
         return X;
     }
 

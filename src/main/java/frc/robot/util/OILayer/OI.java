@@ -26,11 +26,11 @@ public interface OI {
         return noButton;
     }
 
-    default Trigger pivotUp() {
+    default Trigger pivotSalvageUp() {
         return noButton;
     }
 
-    default Trigger pivotDown() {
+    default Trigger pivotSalvageDown() {
         return noButton;
     }
 
@@ -59,6 +59,10 @@ public interface OI {
     }
 
     default Trigger salvageScore() {
+        return noButton;
+    }
+
+    default Trigger runShooterBeltSlow() {
         return noButton;
     }
 }
