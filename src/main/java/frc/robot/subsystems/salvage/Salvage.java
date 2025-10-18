@@ -61,29 +61,15 @@ public class Salvage extends SubsystemBase {
     }
 
     public Command intakeCommand() {
-        // This command is designed to be used with .whileTrue()
-        // While button is held: move to intake, hold position, run roller
-        // When button released: stop roller but hold arm position with gravity compensation
-        return Commands.runEnd(
-                        () -> {
-                            // Move to intake position and run roller
-                            double targetAngle = Setpoint.INTAKE.getAngle().in(Degrees);
-                            double currentAngle = getCurrentAngle().in(Degrees);
-                            double pidOutput = armPIDController.calculate(currentAngle, targetAngle);
-                            double feedforward = calculateFeedforward(currentAngle);
-                            io.setArmVoltage((pidOutput + feedforward) * 12.0);
-                            io.setIntakeSpeed(1.0);
-                        },
-                        () -> {
-                            // When button released: stop roller, hold arm position
-                            io.stopIntake();
-                        },
-                        this)
-                .withName("SalvageIntake");
+        // Just run the intake roller - arm position is independent
+        return Commands.startEnd(() -> io.setIntakeSpeed(1.0), () -> io.stopIntake(), this)
+                .withName("SalvageIntakeRoller");
     }
 
     public Command outtakeCommand() {
-        return Commands.startEnd(() -> io.setIntakeSpeed(-1.0), () -> io.stopIntake(), this);
+        // Just run the outtake roller - arm position is independent
+        return Commands.startEnd(() -> io.setIntakeSpeed(-1.0), () -> io.stopIntake(), this)
+                .withName("SalvageOuttakeRoller");
     }
 
     // 2 setpoints: intake, freight
@@ -105,6 +91,12 @@ public class Salvage extends SubsystemBase {
     public Command moveArmCommand(Setpoint setpoint) {
         return Commands.runOnce(() -> {
                     // Reset the PID controller for a fresh start
+                    double targetAngle = setpoint.getAngle().in(Degrees);
+                    System.out.println("============================================");
+                    System.out.println("MOVING ARM TO: " + setpoint.name());
+                    System.out.println("TARGET ANGLE: " + targetAngle + "°");
+                    System.out.println("CURRENT ANGLE: " + getCurrentAngle().in(Degrees) + "°");
+                    System.out.println("============================================");
                     armPIDController.reset();
                 })
                 .andThen(Commands.run(
@@ -113,10 +105,31 @@ public class Salvage extends SubsystemBase {
                                     double currentAngle = getCurrentAngle().in(Degrees);
                                     double pidOutput = armPIDController.calculate(currentAngle, targetAngle);
                                     double feedforward = calculateFeedforward(currentAngle);
-                                    io.setArmVoltage((pidOutput + feedforward) * 12.0);
+                                    double totalVoltage = (pidOutput + feedforward) * 12.0;
+                                    SmartDashboard.putNumber("Salvage/Target Angle", targetAngle);
+                                    SmartDashboard.putNumber("Salvage/PID Output", pidOutput);
+                                    SmartDashboard.putNumber("Salvage/Total Voltage", totalVoltage);
+                                    io.setArmVoltage(totalVoltage);
                                 },
                                 this)
                         .until(() -> armPIDController.atSetpoint()));
+    }
+
+    /** Toggle between INTAKE and FREIGHT positions - determines target based on current position */
+    public Command toggleArmPositionCommand() {
+        return Commands.either(
+                moveArmCommand(Setpoint.FREIGHT),
+                moveArmCommand(Setpoint.INTAKE),
+                () -> {
+                    // If closer to INTAKE, go to FREIGHT. Otherwise go to INTAKE
+                    double currentAngle = getCurrentAngle().in(Degrees);
+                    boolean goToFreight = Math.abs(currentAngle - Setpoint.INTAKE.getAngle().in(Degrees)) < 
+                           Math.abs(currentAngle - Setpoint.FREIGHT.getAngle().in(Degrees));
+                    System.out.println("Current angle: " + currentAngle + "° -> Going to " + 
+                        (goToFreight ? "FREIGHT" : "INTAKE"));
+                    return goToFreight;
+                }
+        ).withName("Toggle Salvage Arm");
     }
 
     public Command holdArmPositionCommand() {
@@ -124,7 +137,8 @@ public class Salvage extends SubsystemBase {
                 () -> {
                     double currentAngle = getCurrentAngle().in(Degrees);
                     // Hold current position with gravity compensation
-                    double pidOutput = armPIDController.calculate(currentAngle);
+                    // Use current angle as setpoint so PID tries to hold this position
+                    double pidOutput = armPIDController.calculate(currentAngle, currentAngle);
                     double feedforward = calculateFeedforward(currentAngle);
                     io.setArmVoltage((pidOutput + feedforward) * 12.0);
                 },

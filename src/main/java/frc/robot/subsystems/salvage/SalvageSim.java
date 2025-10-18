@@ -71,6 +71,7 @@ public class SalvageSim implements SalvageIO {
 
     @Override
     public void setArmVoltage(double volts) {
+        System.out.println("SalvageSim.setArmVoltage: " + volts + "V");
         armSim.setInput(volts);
     }
 
