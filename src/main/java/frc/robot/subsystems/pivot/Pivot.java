@@ -63,7 +63,7 @@ public class Pivot extends SubsystemBase {
 
         encoder = new DutyCycleEncoder(DIOConstants.pivotEncoderID);
 
-        pivotPID = new PIDController(.01, 0, 0);
+        pivotPID = new PIDController(1, 0, 0);
         pivotFeedforward = new ArmFeedforward(0, 0, 0, 0);
 
         tuneP = new LoggedNetworkNumber("Pivot/PID/P", 0);
