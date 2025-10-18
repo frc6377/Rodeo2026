@@ -30,7 +30,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
  * the value of "simMode" to switch between "sim" (physics sim) and "replay" (log replay from a file).
  */
 public final class Constants {
-    public static final boolean isJared = false;
+    public static final boolean isJared = true;
 
     public static final boolean tuningMode = false;
     public static final boolean useKeyboard = false;
