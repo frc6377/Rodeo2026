@@ -28,15 +28,12 @@ public class ScrapIntake extends SubsystemBase {
     }
 
     public Command intake() {
-        System.out.println("✓ ScrapIntake.intake() command factory method called");
         return runEnd(
                         () -> {
-                            System.out.println("✓✓ Intake command EXECUTE - arm moving to intake position");
                             io.setArmSetpoint(ScrapArmConstants.kArmIntakeAngle);
                             io.setRollerSpeed(300);
                         },
                         () -> {
-                            System.out.println("✓✓ Intake command END - arm returning to stow");
                             io.setArmSetpoint(ScrapArmConstants.kArmStowAngle);
                             io.setRollerSpeed(0);
                         })

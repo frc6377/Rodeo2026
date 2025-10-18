@@ -11,7 +11,6 @@ public class OIKeyboard implements OI {
     private static final XboxController controller = new XboxController(0);
 
     public OIKeyboard() {
-        System.out.println("OIKeyboard constructor called - controller on port 0");
     }
 
     // *** Keyboard 0 Mappings ***
@@ -82,10 +81,6 @@ public class OIKeyboard implements OI {
 
     @Override
     public Trigger intake() {
-        System.out.println("intake() method called, returning Z trigger (button 1)");
-        // Add debug logging to see if button is being pressed
-        Z.onTrue(Commands.runOnce(() -> System.out.println(">>> Z BUTTON PRESSED! <<<")));
-        Z.onFalse(Commands.runOnce(() -> System.out.println(">>> Z BUTTON RELEASED! <<<")));
         return Z;
     }
 

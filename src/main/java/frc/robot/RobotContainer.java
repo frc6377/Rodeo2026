@@ -46,20 +46,7 @@ public class RobotContainer {
     private final Salvage salvage;
 
     // OI
-    private final OI controller;
-
-    {
-        if (Constants.useKeyboard) {
-            System.out.println("✓ Initializing OIKeyboard for input");
-            controller = new OIKeyboard();
-        } else if (Constants.isJared) {
-            System.out.println("✓ Initializing OIXboxJared for input");
-            controller = new OIXboxJared();
-        } else {
-            System.out.println("✓ Initializing OIXbox for input");
-            controller = new OIXbox();
-        }
-    }
+    private final OI controller = Constants.useKeyboard ? new OIKeyboard() : (Constants.isJared ? new OIXboxJared() : new OIXbox());
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -127,7 +114,6 @@ public class RobotContainer {
         controller.zeroDrivebase().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
         // Scrap Intake
-        System.out.println("✓ Binding intake trigger to scrapIntake.intake() command");
         controller.intake().whileTrue(scrapIntake.intake());
 
         // Shooter

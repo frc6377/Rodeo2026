@@ -73,7 +73,6 @@ public class ScrapIntakeReal implements ScrapIntakeIO {
 
     @Override
     public void setArmSetpoint(Angle degrees) {
-        System.out.println("Setting arm setpoint to: " + degrees.in(Degrees) + " degrees");
         armSetpoint = degrees.in(Degrees);
         pidController.setSetpoint(armSetpoint);
         double output = pidController.calculate(pivotEncoder.get());
