@@ -18,10 +18,8 @@ public final class Autos {
 
     // Go forward (1.5s) turn 45deg go forward (2s) turn -45deg go forward (1s) score salvage
     public static Command LeftScoreAuto(
-            Drive driveSubsystem,
-            Salvage salvageSubsystem,
-            ScrapIntake scrapIntakeSubsystem,
-            ScrapShooter scrapShooterSubsystem) {
+            Drive driveSubsystem, Salvage salvageSubsystem, ScrapIntake scrapIntakeSubsystem) {
+        // ScrapShooter scrapShooterSubsystem) {
         int turnDegrees = 30;
         double scaler = 1;
         return Commands.sequence(
@@ -38,10 +36,8 @@ public final class Autos {
 
     // ONLY GETS 0.5s TO SCORE
     public static Command CenterScoreAuto(
-            Drive driveSubsystem,
-            Salvage salvageSubsystem,
-            ScrapIntake scrapIntakeSubsystem,
-            ScrapShooter scrapShooterSubsystem) {
+            Drive driveSubsystem, Salvage salvageSubsystem, ScrapIntake scrapIntakeSubsystem) {
+        // ScrapShooter scrapShooterSubsystem) {
         int turnDegrees = 30;
         double scaler = 1;
         return Commands.sequence(
@@ -58,18 +54,15 @@ public final class Autos {
     }
 
     public static Command LeaveDockAuto(
-            Drive driveSubsystem,
-            Salvage salvageSubsystem,
-            ScrapIntake scrapIntakeSubsystem,
-            ScrapShooter scrapShooterSubsystem) {
-        return Commands.sequence(driveSubsystem.setForwardCommand(1.5, 0.45)).withName("LeaveDockAuto");
+            Drive driveSubsystem, Salvage salvageSubsystem, ScrapIntake scrapIntakeSubsystem) {
+        // ScrapShooter scrapShooterSubsystem) {
+        return Commands.sequence(dropToZero(salvageSubsystem), driveSubsystem.setForwardCommand(1.5, 0.45))
+                .withName("LeaveDockAuto");
     }
 
     public static Command ShootScrapAuto(
-            Drive driveSubsystem,
-            Salvage salvageSubsystem,
-            ScrapIntake scrapIntakeSubsystem,
-            ScrapShooter scrapShooterSubsystem) {
+            Drive driveSubsystem, Salvage salvageSubsystem, ScrapIntake scrapIntakeSubsystem) {
+        // ScrapShooter scrapShooterSubsystem) {
         return Commands.sequence(
                         driveSubsystem.setForwardCommand(1.5, 0.45),
                         driveSubsystem.turnCommand(225).withTimeout(2),
@@ -77,9 +70,9 @@ public final class Autos {
                         scrapIntakeSubsystem.intake().withTimeout(2),
                         Commands.waitSeconds(1),
                         driveSubsystem.turnCommand(225).withTimeout(2),
-                        scrapShooterSubsystem.startShooter(1),
-                        Commands.waitSeconds(5),
-                        scrapShooterSubsystem.stopShooter())
+                        // scrapShooterSubsystem.startShooter(1),
+                        Commands.waitSeconds(5))
+                // scrapShooterSubsystem.stopShooter())
                 .withName("ShootScrapAuto");
     }
     // Commands

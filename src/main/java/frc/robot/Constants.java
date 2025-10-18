@@ -92,12 +92,12 @@ public final class Constants {
         public static final int intakeMotorID = 6;
         public static final int pivotMotorID = 7;
         public static final int pivotEncoderID = 5;
-        public static final int shooterMotor1ID = 10;
-        public static final int shooterMotor2ID = 11;
+        public static final int shooterMotor1ID = 20; // 10;
+        public static final int shooterMotor2ID = 21; // 11;
 
         // Salvage Motor IDs
-        public static final int salvageMotor = 8;
-        public static final int salvageArmMotor = 12;
+        public static final int salvageMotor = 6;
+        public static final int salvageArmMotor = 11;
     }
 
     public final class SensorIDs {

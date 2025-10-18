@@ -25,7 +25,6 @@ import frc.robot.commands.Autos;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.salvage.Salvage;
 import frc.robot.subsystems.scrap.ScrapIntake;
-import frc.robot.subsystems.scrap.ScrapShooter;
 import frc.robot.util.OILayer.OI;
 import frc.robot.util.OILayer.OIKeyboard;
 import frc.robot.util.OILayer.OIXbox;
@@ -42,7 +41,7 @@ public class RobotContainer {
     // Subsystems
     private final Drive drive;
     private final ScrapIntake scrapIntake;
-    private final ScrapShooter scrapShooter = new ScrapShooter();
+    // private final ScrapShooter scrapShooter = new ScrapShooter();
     private final Salvage salvage;
 
     // OI
@@ -85,16 +84,16 @@ public class RobotContainer {
         // Set up SysId routines
         autoChooser.addOption("Example Auto", Commands.none());
 
-        Command auto1 = Autos.LeftScoreAuto(drive, salvage, scrapIntake, scrapShooter);
+        Command auto1 = Autos.LeftScoreAuto(drive, salvage, scrapIntake);
         autoChooser.addOption(auto1.getName(), auto1);
 
-        Command auto2 = Autos.CenterScoreAuto(drive, salvage, scrapIntake, scrapShooter);
+        Command auto2 = Autos.CenterScoreAuto(drive, salvage, scrapIntake);
         autoChooser.addOption(auto2.getName(), auto2);
 
-        Command auto3 = Autos.LeaveDockAuto(drive, salvage, scrapIntake, scrapShooter);
+        Command auto3 = Autos.LeaveDockAuto(drive, salvage, scrapIntake);
         autoChooser.addOption(auto3.getName(), auto3);
 
-        Command auto4 = Autos.ShootScrapAuto(drive, salvage, scrapIntake, scrapShooter);
+        Command auto4 = Autos.ShootScrapAuto(drive, salvage, scrapIntake);
         autoChooser.addOption(auto4.getName(), auto4);
 
         // Configure the button bindings
@@ -115,11 +114,11 @@ public class RobotContainer {
         controller.zeroDrivebase().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
         // Scrap Intake
-        controller.scrapIntake().whileTrue(scrapIntake.intake());
+        // controller.scrapIntake().whileTrue(scrapIntake.intake());
 
         // Shooter
-        controller.shooterOuttake().whileTrue(scrapShooter.shootScrap());
-        controller.runShooterBeltSlow().whileTrue(scrapShooter.startShooter(0.1));
+        // controller.shooterOuttake().whileTrue(scrapShooter.shootScrap());
+        // controller.runShooterBeltSlow().whileTrue(scrapShooter.startShooter(0.1));
 
         // Salvage - Toggle arm between INTAKE (0°) and FREIGHT (43.75°)
         // Simple toggle - just switches the target, default command handles movement
