@@ -78,7 +78,7 @@ public class OIKeyboard implements OI {
     // }
 
     @Override
-    public Trigger intake() {
+    public Trigger scrapIntake() {
         return Z;
     }
 
@@ -110,5 +110,10 @@ public class OIKeyboard implements OI {
     @Override
     public Trigger salvageArmTrigger() {
         return M;
+    }
+
+    @Override 
+    public Trigger salvageScore(){
+        return Num1;
     }
 }

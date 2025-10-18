@@ -78,7 +78,12 @@ public class OIXboxJared implements OI {
     }
 
     @Override
-    public Trigger intake() {
+    public Trigger scrapIntake() {
         return a;
+    }
+
+    @Override
+    public Trigger salvageScore(){
+        return rightTriggerAsButton;
     }
 }

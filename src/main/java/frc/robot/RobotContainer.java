@@ -115,7 +115,7 @@ public class RobotContainer {
         controller.zeroDrivebase().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
         // Scrap Intake
-        controller.intake().whileTrue(scrapIntake.intake());
+        controller.scrapIntake().whileTrue(scrapIntake.intake());
 
         // Shooter
         controller.shooterOuttake().whileTrue(scrapShooter.shootScrap());

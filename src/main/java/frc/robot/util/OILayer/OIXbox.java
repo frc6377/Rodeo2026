@@ -81,4 +81,9 @@ public class OIXbox implements OI {
     public Trigger intake() {
         return a;
     }
+
+    @Override
+    public Trigger salvageScore(){
+        return rightTriggerAsButton;
+    }
 }
