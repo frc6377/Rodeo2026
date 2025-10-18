@@ -112,8 +112,8 @@ public class OIKeyboard implements OI {
         return M;
     }
 
-    @Override 
-    public Trigger salvageScore(){
+    @Override
+    public Trigger salvageScore() {
         return Num1;
     }
 }

@@ -119,10 +119,7 @@ public class RobotContainer {
 
         // Shooter
         controller.shooterOuttake().whileTrue(scrapShooter.shootScrap());
-        controller.salvageIntake().onTrue(
-            Commands.runOnce(() -> salvage.cancel())
-                .andThen(salvage.toggleArmPositionCommand())
-        );
+        controller.salvageIntake().onTrue(salvage.toggleArmPositionCommand());
     }
 
     /**

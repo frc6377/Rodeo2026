@@ -58,7 +58,7 @@ public interface OI {
         return noButton;
     }
 
-    default Trigger salvageScore(){
+    default Trigger salvageScore() {
         return noButton;
     }
 }

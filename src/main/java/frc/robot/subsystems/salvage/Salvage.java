@@ -148,19 +148,18 @@ public class Salvage extends SubsystemBase {
 
     /** Toggle between INTAKE and FREIGHT positions - determines target based on current position */
     public Command toggleArmPositionCommand() {
-        return Commands.either(
-                moveArmCommand(Setpoint.FREIGHT),
-                moveArmCommand(Setpoint.INTAKE),
-                () -> {
+        return Commands.either(moveArmCommand(Setpoint.FREIGHT), moveArmCommand(Setpoint.INTAKE), () -> {
                     // If closer to INTAKE, go to FREIGHT. Otherwise go to INTAKE
                     double currentAngle = getCurrentAngle().in(Degrees);
-                    boolean goToFreight = Math.abs(currentAngle - Setpoint.INTAKE.getAngle().in(Degrees)) < 
-                           Math.abs(currentAngle - Setpoint.FREIGHT.getAngle().in(Degrees));
-                    System.out.println("Current angle: " + currentAngle + "° -> Going to " + 
-                        (goToFreight ? "FREIGHT" : "INTAKE"));
+                    boolean goToFreight =
+                            Math.abs(currentAngle - Setpoint.INTAKE.getAngle().in(Degrees))
+                                    < Math.abs(currentAngle
+                                            - Setpoint.FREIGHT.getAngle().in(Degrees));
+                    System.out.println(
+                            "Current angle: " + currentAngle + "° -> Going to " + (goToFreight ? "FREIGHT" : "INTAKE"));
                     return goToFreight;
-                }
-        ).withName("Toggle Salvage Arm");
+                })
+                .withName("Toggle Salvage Arm");
     }
 
     public Command holdArmPositionCommand() {
