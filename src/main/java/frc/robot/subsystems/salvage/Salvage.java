@@ -162,7 +162,7 @@ public class Salvage extends SubsystemBase {
 
                     targetSetpoint = distanceToIntake < distanceToFreight ? Setpoint.INTAKE : Setpoint.FREIGHT;
 
-                    io.setArmPosition(targetSetpoint.getAngle().in(Degrees));
+                    
                 })
                 .withName("Toggle Salvage Arm");
     }

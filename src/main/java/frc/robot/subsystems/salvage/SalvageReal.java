@@ -56,9 +56,6 @@ public class SalvageReal implements SalvageIO {
         double output = pid.calculate(salvagePivotEncoder.getAbsolutePosition().getValueAsDouble(), degrees);
         setArmSpeed(output);
         armSetpoint = degrees;
-        // Note: Using manual control instead of Talon PID
-        // The actual PID control should be handled in the subsystem layer
-        // This is just storing the setpoint for reference
     }
 
     @Override

@@ -46,11 +46,15 @@ public interface OI {
         return noButton;
     }
 
-    default Trigger salvageIntake() {
+    default Trigger salvageToggle() {
         return noButton;
     }
 
     default Trigger salvageOuttake() {
+        return noButton;
+    }
+
+    default Trigger salvageIntake() {
         return noButton;
     }
 

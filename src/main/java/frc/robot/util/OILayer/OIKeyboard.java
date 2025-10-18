@@ -98,13 +98,18 @@ public class OIKeyboard implements OI {
     }
 
     @Override
-    public Trigger salvageIntake() {
+    public Trigger salvageToggle() {
         return Period;
     }
 
     @Override
     public Trigger salvageOuttake() {
         return Comma;
+    }
+
+    @Override
+    public Trigger salvageIntake() {
+        return V;
     }
 
     @Override
