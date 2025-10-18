@@ -1,13 +1,15 @@
 package frc.robot.subsystems.salvage;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.system.plant.DCMotor;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
+
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import frc.robot.Constants.SalvageArmConstants;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
@@ -21,59 +23,42 @@ public class SalvageSim extends SalvageReal {
 
     private double armSetpoint = 0.0;
 
-    // Salvage arm simulation constants - adjust these based on your actual arm
-    private static final double kArmGearing = 100.0;
-    private static final double kArmMOI = 0.5; // kg*m^2
-    private static final double kArmLength = 0.5; // meters
-    private static final double kArmMinAngle = 0.0; // degrees
-    private static final double kArmMaxAngle = 90.0; // degrees
-
     public SalvageSim() {
         armSim = new SingleJointedArmSim(
-                DCMotor.getCIM(1),
-                kArmGearing,
-                kArmMOI,
-                kArmLength,
-                Units.degreesToRadians(kArmMinAngle),
-                Units.degreesToRadians(kArmMaxAngle),
+                SalvageArmConstants.kArmMotor,
+                SalvageArmConstants.kArmGearing,
+                SalvageArmConstants.kArmMOI,
+                SalvageArmConstants.kArmLength.in(Meters),
+                SalvageArmConstants.kArmMinAngle.in(Radians),
+                SalvageArmConstants.kArmMaxAngle.in(Radians),
                 true,
-                Units.degreesToRadians(0));
+                SalvageArmConstants.kArmStartAngle.in(Radians));
 
         armMechanism2d = new LoggedMechanism2d(1, 1);
         root = armMechanism2d.getRoot("Salvage Arm Sim", 0, 0);
-        baseMech = root.append(
-                new LoggedMechanismLigament2d("Salvage Arm Sim", kArmLength, 0, 20, new Color8Bit(Color.kGreen)));
+        baseMech = root.append(new LoggedMechanismLigament2d(
+                "Salvage Arm Sim", SalvageArmConstants.kArmLength.in(Meters), 0, 20, new Color8Bit(Color.kGreen)));
         salvageTab.add("Salvage Arm Mech", armMechanism2d);
     }
 
     @Override
     public void updateInputs(SalvageIOInputs inputs) {
-        // PID constants - tune these
-        final double kP = 0.02;
-        final double kD = 0.01;
-
-        // Calculate position error
-        double currentAngle = Units.radiansToDegrees(armSim.getAngleRads());
-        double error = armSetpoint - currentAngle;
-        double velocity = Units.radiansToDegrees(armSim.getVelocityRadPerSec());
-
-        // Calculate output voltage using PD control
-        double voltage = error * kP - velocity * kD;
-        voltage = MathUtil.clamp(voltage, -12.0, 12.0);
-
-        // Apply voltage and update sim
-        armSim.setInput(voltage);
+        // The voltage is controlled by the main Salvage subsystem's PID,
+        // not by an internal sim PID. Just update the simulation.
         armSim.update(0.02);
 
         // Update mechanism display
+        double currentAngle = Units.radiansToDegrees(armSim.getAngleRads());
         baseMech.setAngle(currentAngle);
 
         // Update telemetry
         inputs.armPositionDegrees = currentAngle;
-        inputs.armVelocityDegreesPerSec = velocity;
+        inputs.armVelocityDegreesPerSec = Units.radiansToDegrees(armSim.getVelocityRadPerSec());
         inputs.armCurrentAmps = armSim.getCurrentDrawAmps();
         inputs.intakeCurrentAmps = 2.0; // Simulated intake current
-        inputs.atSetpoint = Math.abs(error) < 2.0;
+        inputs.atSetpoint = Math.abs(inputs.armPositionDegrees - armSetpoint) < SalvageArmConstants.PID.tolerance;
+
+        System.out.println("Salvage Sim - Angle: " + currentAngle + " | Setpoint: " + armSetpoint);
     }
 
     @Override

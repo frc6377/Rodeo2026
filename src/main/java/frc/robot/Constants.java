@@ -108,4 +108,35 @@ public final class Constants {
     public final class PivotConstants {
         public static final double gearRatio = 40; // TO BE CHANGED
     }
+
+    public final class SalvageArmConstants {
+        // Arm Positions (setpoints)
+        public static final Angle kArmIntakeAngle = Degrees.of(0);
+        public static final Angle kArmStowAngle = Degrees.of(63.244319);
+        public static final Angle kArmFreightAngle = Degrees.of(43.750137);
+
+        // Simulation constants
+        public static final DCMotor kArmMotor = DCMotor.getCIM(1);
+        public static final double kArmGearing = 100.0;
+        public static final double kArmMOI = 0.5; // kg*m^2
+        public static final Distance kArmLength = Meters.of(0.5);
+        public static final Angle kArmMinAngle = Degrees.of(-10); // Physical minimum
+        public static final Angle kArmMaxAngle = Degrees.of(90); // Physical maximum
+        public static final Angle kArmStartAngle = kArmStowAngle; // Start at stow position
+
+        // PID Constants
+        public static class PID {
+            public static final double kP = 0.05; // Main subsystem PID - tuned for smooth movement
+            public static final double kI = 0.0;
+            public static final double kD = 0.0;
+            public static final double tolerance = 2.0; // degrees
+        }
+
+        // Real robot Talon PID (currently unused, but configured on motor)
+        public static class TalonPID {
+            public static final double kP = 1.0;
+            public static final double kI = 0.0;
+            public static final double kD = 0.0;
+        }
+    }
 }

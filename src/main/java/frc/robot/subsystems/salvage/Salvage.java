@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.SalvageArmConstants;
 
 public class Salvage extends SubsystemBase {
     private final SalvageIO io;
@@ -16,8 +17,9 @@ public class Salvage extends SubsystemBase {
 
     public Salvage(SalvageIO io) {
         this.io = io;
-        armPIDController = new PIDController(1, 0.0, 0.0);
-        armPIDController.setTolerance(2.0);
+        armPIDController =
+                new PIDController(SalvageArmConstants.PID.kP, SalvageArmConstants.PID.kI, SalvageArmConstants.PID.kD);
+        armPIDController.setTolerance(SalvageArmConstants.PID.tolerance);
         armPIDController.enableContinuousInput(0, 360);
     }
 
@@ -36,21 +38,36 @@ public class Salvage extends SubsystemBase {
     }
 
     public Command intakeCommand() {
-        return Commands.startEnd(() -> io.setIntakeSpeed(1.0), () -> io.stopIntake(), this);
+        // This command is designed to be used with .whileTrue()
+        // While button is held: move to intake, hold position, run roller
+        // When button released: the finallyDo will stop everything, then need separate command to return to stow
+        return Commands.runEnd(
+                        () -> {
+                            // Move to intake position and run roller
+                            double targetAngle = Setpoint.INTAKE.getAngle().in(Degrees);
+                            double currentAngle = getCurrentAngle().in(Degrees);
+                            double output = armPIDController.calculate(currentAngle, targetAngle);
+                            io.setArmVoltage(output * 12.0);
+                            io.setIntakeSpeed(1.0);
+                        },
+                        () -> {
+                            // When button released: stop roller and arm
+                            io.stopIntake();
+                            io.stopArm();
+                        })
+                .andThen(moveArmCommand(Setpoint.STOW)) // Return to stow after button released
+                .withName("SalvageIntake");
     }
 
     public Command outtakeCommand() {
         return Commands.startEnd(() -> io.setIntakeSpeed(-1.0), () -> io.stopIntake(), this);
     }
 
-    // 3 setpoints: intake, stow, frieght
-
-    // STOW = 63.244319
-    // FREIGHT = 43.750137
+    // 3 setpoints: intake, stow, freight
     public enum Setpoint {
-        INTAKE(Degrees.of(0)),
-        STOW(Degrees.of(63.244319)),
-        FREIGHT(Degrees.of(43.750137));
+        INTAKE(SalvageArmConstants.kArmIntakeAngle),
+        STOW(SalvageArmConstants.kArmStowAngle),
+        FREIGHT(SalvageArmConstants.kArmFreightAngle);
 
         private final Angle angle;
 
