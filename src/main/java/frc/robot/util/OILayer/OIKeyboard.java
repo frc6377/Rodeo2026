@@ -1,6 +1,7 @@
 package frc.robot.util.OILayer;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -8,6 +9,10 @@ import java.util.function.DoubleSupplier;
 
 public class OIKeyboard implements OI {
     private static final XboxController controller = new XboxController(0);
+
+    public OIKeyboard() {
+        System.out.println("OIKeyboard constructor called - controller on port 0");
+    }
 
     // *** Keyboard 0 Mappings ***
     // Axies
@@ -70,13 +75,17 @@ public class OIKeyboard implements OI {
         return LeftRightArrows;
     }
 
-    @Override
-    public Trigger zeroDrivebase() {
-        return Z;
-    }
+    // @Override
+    // public Trigger zeroDrivebase() {
+    //     return Z;
+    // }
 
     @Override
     public Trigger intake() {
+        System.out.println("intake() method called, returning Z trigger (button 1)");
+        // Add debug logging to see if button is being pressed
+        Z.onTrue(Commands.runOnce(() -> System.out.println(">>> Z BUTTON PRESSED! <<<")));
+        Z.onFalse(Commands.runOnce(() -> System.out.println(">>> Z BUTTON RELEASED! <<<")));
         return Z;
     }
 

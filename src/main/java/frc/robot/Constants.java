@@ -33,7 +33,7 @@ public final class Constants {
     public static final boolean isJared = false;
 
     public static final boolean tuningMode = false;
-    public static final boolean useKeyboard = false;
+    public static final boolean useKeyboard = true;
     public static final Mode simMode = Mode.SIM;
     public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 
@@ -67,6 +67,13 @@ public final class Constants {
             public static final double kI = 0.0;
             public static final double kD = 0.01;
         }
+
+        public static class FEEDFORWARD {
+            public static final double kS = 0.1;
+            public static final double kG = 0.1;
+            public static final double kV = 0.1;
+            public static final double kA = 0.1;
+        }
     }
 
     public final class MotorIDs {
@@ -83,7 +90,7 @@ public final class Constants {
         // Scrap Motors IDs
         public static final int intakeMotorID = 6;
         public static final int pivotMotorID = 7;
-        public static final int pivotEncoderID = 50;
+        public static final int pivotEncoderID = 12;
         public static final int shooterMotor1ID = 10;
         public static final int shooterMotor2ID = 11;
 

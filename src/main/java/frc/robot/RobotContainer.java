@@ -27,6 +27,7 @@ import frc.robot.subsystems.salvage.Salvage;
 import frc.robot.subsystems.scrap.ScrapIntake;
 import frc.robot.subsystems.scrap.ScrapShooter;
 import frc.robot.util.OILayer.OI;
+import frc.robot.util.OILayer.OIKeyboard;
 import frc.robot.util.OILayer.OIXbox;
 import frc.robot.util.OILayer.OIXboxJared;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -44,8 +45,21 @@ public class RobotContainer {
     private final ScrapShooter scrapShooter = new ScrapShooter();
     private final Salvage salvage;
 
-    // Controller
-    private final OI controller = Constants.isJared ? new OIXboxJared() : new OIXbox();
+    // OI
+    private final OI controller;
+
+    {
+        if (Constants.useKeyboard) {
+            System.out.println("✓ Initializing OIKeyboard for input");
+            controller = new OIKeyboard();
+        } else if (Constants.isJared) {
+            System.out.println("✓ Initializing OIXboxJared for input");
+            controller = new OIXboxJared();
+        } else {
+            System.out.println("✓ Initializing OIXbox for input");
+            controller = new OIXbox();
+        }
+    }
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -113,6 +127,7 @@ public class RobotContainer {
         controller.zeroDrivebase().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
         // Scrap Intake
+        System.out.println("✓ Binding intake trigger to scrapIntake.intake() command");
         controller.intake().whileTrue(scrapIntake.intake());
 
         // Shooter

@@ -42,17 +42,23 @@ public class ScrapIntakeSim extends ScrapIntakeReal {
                 ScrapArmConstants.kArmBaseAngle.in(Radians),
                 20,
                 new Color8Bit(Color.kBlue)));
-        Logger.recordOutput("Arm Mech", armMechanism2d);
+        // Logger.recordOutput("Arm Mech", armMechanism2d);
     }
 
+    @Override
     public void updateInputs(ScrapIntakeIOInputs inputs) {
-        super.updateInputs(inputs);
-
+        // Update simulation first
         armSim.setInput(pivotMotor.getMotorOutputPercent() * RobotController.getBatteryVoltage());
         armSim.update(0.02);
 
-        baseMech.setAngle(Radians.of(armSim.getAngleRads()).in(Degrees));
+        // Update inputs from simulation
+        inputs.armPositionDegrees = Radians.of(armSim.getAngleRads()).in(Degrees);
+        inputs.armCurrentAmps = armSim.getCurrentDrawAmps();
+        inputs.rollerCurrentAmps = intakeMotor.getStatorCurrent();
+        inputs.atSetpoint = Math.abs(inputs.armPositionDegrees - super.armSetpoint) < 1.0;
 
-        Logger.recordOutput("Arm Mech", armMechanism2d);
+        // Update visualization
+        baseMech.setAngle(inputs.armPositionDegrees);
+        Logger.recordOutput("Arm Mechanism", armMechanism2d);
     }
 }

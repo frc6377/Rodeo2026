@@ -18,6 +18,8 @@ public interface ScrapIntakeIO {
         return null;
     }
 
+    default void setArmSetpoint(Angle degrees) {}
+
     default void setRollerSpeed(double rpm) {}
 
     default void setArmPercent(double volts) {}
