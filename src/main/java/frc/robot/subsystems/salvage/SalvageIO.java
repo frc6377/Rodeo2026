@@ -13,6 +13,8 @@ public interface SalvageIO {
 
     default void setArmPosition(double degrees) {}
 
+    default void setArmSpeed(double degreesPerSec) {}
+
     default void setArmVoltage(double volts) {}
 
     default void stopArm() {}

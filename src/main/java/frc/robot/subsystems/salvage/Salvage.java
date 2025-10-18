@@ -179,6 +179,16 @@ public class Salvage extends SubsystemBase {
                 this);
     }
 
+    public Command pivotUpCommand() {
+        return Commands.startEnd(() -> io.setArmSpeed(0.5), () -> io.stopArm(), this)
+                .withName("SalvagePivotUp");
+    }
+
+    public Command pivotDownCommand() {
+        return Commands.startEnd(() -> io.setArmSpeed(-0.5), () -> io.stopArm(), this)
+                .withName("SalvagePivotDown");
+    }
+
     public void stopArm() {
         io.stopArm();
     }
