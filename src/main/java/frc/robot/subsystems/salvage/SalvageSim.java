@@ -57,8 +57,6 @@ public class SalvageSim extends SalvageReal {
         inputs.armCurrentAmps = armSim.getCurrentDrawAmps();
         inputs.intakeCurrentAmps = 2.0; // Simulated intake current
         inputs.atSetpoint = Math.abs(inputs.armPositionDegrees - armSetpoint) < SalvageArmConstants.PID.tolerance;
-
-        System.out.println("Salvage Sim - Angle: " + currentAngle + " | Setpoint: " + armSetpoint);
     }
 
     @Override

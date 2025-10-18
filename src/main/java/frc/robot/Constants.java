@@ -54,7 +54,7 @@ public final class Constants {
         public static final double kArmGearing = 40;
         public static final Angle kArmMinAngle = Degrees.of(-10); // Allow negative angles for intake
         public static final Angle kArmMaxAngle = Degrees.of(100); // Maximum stow position
-        public static final Distance kArmLength = Inches.of(25.88);
+        public static final Distance kArmLength = Inches.of(11.5);
         public static final Angle kArmBaseAngle = Degrees.of(0);
         public static final Angle kArmScoringAngle = Degrees.of(-45); // -45 degrees
         public static final Angle kArmIntakeAngle = Degrees.of(-5); // -45 degrees
@@ -106,7 +106,7 @@ public final class Constants {
     }
 
     public final class PivotConstants {
-        public static final double gearRatio = 40; // TO BE CHANGED
+        public static final double gearRatio = 50; // TO BE CHANGED
     }
 
     public final class SalvageArmConstants {
