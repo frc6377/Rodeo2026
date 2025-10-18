@@ -34,7 +34,7 @@ public interface OI {
         return noButton;
     }
 
-    default Trigger intake() {
+    default Trigger scrapIntake() {
         return noButton;
     }
 
@@ -55,6 +55,10 @@ public interface OI {
     }
 
     default Trigger salvageArmTrigger() {
+        return noButton;
+    }
+
+    default Trigger salvageScore(){
         return noButton;
     }
 }
