@@ -14,13 +14,17 @@ public class Salvage extends SubsystemBase {
     private final SalvageIO io;
     private final SalvageIO.SalvageIOInputs inputs = new SalvageIO.SalvageIOInputs();
     private final PIDController armPIDController;
+    private int currentSetpointIndex = 0;
 
     public Salvage(SalvageIO io) {
         this.io = io;
         armPIDController =
                 new PIDController(SalvageArmConstants.PID.kP, SalvageArmConstants.PID.kI, SalvageArmConstants.PID.kD);
         armPIDController.setTolerance(SalvageArmConstants.PID.tolerance);
-        armPIDController.enableContinuousInput(0, 360);
+        // No continuous input - arm doesn't do full rotations
+
+        // Set default command to hold arm at current position with gravity compensation
+        setDefaultCommand(holdArmPositionCommand());
     }
 
     @Override
@@ -31,31 +35,50 @@ public class Salvage extends SubsystemBase {
         SmartDashboard.putNumber("Salvage/Arm Current", inputs.armCurrentAmps);
         SmartDashboard.putNumber("Salvage/Intake Current", inputs.intakeCurrentAmps);
         SmartDashboard.putBoolean("Salvage/At Setpoint", inputs.atSetpoint);
+
+        // Always apply gravity compensation to prevent arm from falling
+        // Commands will add their own control output on top of this
+        double currentAngle = getCurrentAngle().in(Degrees);
+        double gravityCompensation = calculateFeedforward(currentAngle);
+        SmartDashboard.putNumber("Salvage/Gravity Compensation", gravityCompensation);
     }
 
     public Angle getCurrentAngle() {
         return Degrees.of(inputs.armPositionDegrees);
     }
 
+    /**
+     * Calculate feedforward voltage to counteract gravity
+     *
+     * @param angleDegrees The current arm angle in degrees
+     * @return The feedforward voltage needed
+     */
+    private double calculateFeedforward(double angleDegrees) {
+        // Gravity compensation: kG * cos(angle)
+        // This provides maximum support when horizontal (90°) and zero when vertical (0°)
+        double angleRadians = Math.toRadians(angleDegrees);
+        return SalvageArmConstants.Feedforward.kG * Math.cos(angleRadians);
+    }
+
     public Command intakeCommand() {
         // This command is designed to be used with .whileTrue()
         // While button is held: move to intake, hold position, run roller
-        // When button released: the finallyDo will stop everything, then need separate command to return to stow
+        // When button released: stop roller but hold arm position with gravity compensation
         return Commands.runEnd(
                         () -> {
                             // Move to intake position and run roller
                             double targetAngle = Setpoint.INTAKE.getAngle().in(Degrees);
                             double currentAngle = getCurrentAngle().in(Degrees);
-                            double output = armPIDController.calculate(currentAngle, targetAngle);
-                            io.setArmVoltage(output * 12.0);
+                            double pidOutput = armPIDController.calculate(currentAngle, targetAngle);
+                            double feedforward = calculateFeedforward(currentAngle);
+                            io.setArmVoltage((pidOutput + feedforward) * 12.0);
                             io.setIntakeSpeed(1.0);
                         },
                         () -> {
-                            // When button released: stop roller and arm
+                            // When button released: stop roller, hold arm position
                             io.stopIntake();
-                            io.stopArm();
-                        })
-                .andThen(moveArmCommand(Setpoint.STOW)) // Return to stow after button released
+                        },
+                        this)
                 .withName("SalvageIntake");
     }
 
@@ -63,10 +86,9 @@ public class Salvage extends SubsystemBase {
         return Commands.startEnd(() -> io.setIntakeSpeed(-1.0), () -> io.stopIntake(), this);
     }
 
-    // 3 setpoints: intake, stow, freight
+    // 2 setpoints: intake, freight
     public enum Setpoint {
         INTAKE(SalvageArmConstants.kArmIntakeAngle),
-        STOW(SalvageArmConstants.kArmStowAngle),
         FREIGHT(SalvageArmConstants.kArmFreightAngle);
 
         private final Angle angle;
@@ -81,25 +103,56 @@ public class Salvage extends SubsystemBase {
     }
 
     public Command moveArmCommand(Setpoint setpoint) {
-        return Commands.run(
-                        () -> {
-                            double targetAngle = setpoint.getAngle().in(Degrees);
-                            double currentAngle = getCurrentAngle().in(Degrees);
-                            double output = armPIDController.calculate(currentAngle, targetAngle);
-                            io.setArmVoltage(output * 12.0);
-                        },
-                        this)
-                .until(() -> armPIDController.atSetpoint());
+        return Commands.runOnce(() -> {
+                    // Reset the PID controller for a fresh start
+                    armPIDController.reset();
+                })
+                .andThen(Commands.run(
+                                () -> {
+                                    double targetAngle = setpoint.getAngle().in(Degrees);
+                                    double currentAngle = getCurrentAngle().in(Degrees);
+                                    double pidOutput = armPIDController.calculate(currentAngle, targetAngle);
+                                    double feedforward = calculateFeedforward(currentAngle);
+                                    io.setArmVoltage((pidOutput + feedforward) * 12.0);
+                                },
+                                this)
+                        .until(() -> armPIDController.atSetpoint()));
     }
 
     public Command holdArmPositionCommand() {
         return Commands.run(
                 () -> {
                     double currentAngle = getCurrentAngle().in(Degrees);
-                    double output = armPIDController.calculate(currentAngle);
-                    io.setArmVoltage(output * 12.0);
+                    // Hold current position with gravity compensation
+                    double pidOutput = armPIDController.calculate(currentAngle);
+                    double feedforward = calculateFeedforward(currentAngle);
+                    io.setArmVoltage((pidOutput + feedforward) * 12.0);
                 },
                 this);
+    }
+
+    public Command cycleSetpointsCommand() {
+        return Commands.sequence(
+                        Commands.runOnce(() -> System.out.println("Moving to INTAKE (0°)")),
+                        moveArmCommand(Setpoint.INTAKE).withTimeout(3),
+                        Commands.waitSeconds(1),
+                        Commands.runOnce(() -> System.out.println("Moving to FREIGHT (43.75°)")),
+                        moveArmCommand(Setpoint.FREIGHT).withTimeout(3),
+                        Commands.waitSeconds(1))
+                .repeatedly()
+                .withName("Cycle Salvage Setpoints");
+    }
+
+    public Command nextSetpointCommand() {
+        return Commands.runOnce(() -> {
+                    Setpoint[] setpoints = Setpoint.values();
+                    currentSetpointIndex = (currentSetpointIndex + 1) % setpoints.length;
+                    Setpoint nextSetpoint = setpoints[currentSetpointIndex];
+                    System.out.println("Moving to " + nextSetpoint.name() + " ("
+                            + nextSetpoint.getAngle().in(Degrees) + "°)");
+                })
+                .andThen(moveArmCommand(Setpoint.values()[currentSetpointIndex]))
+                .withName("Next Setpoint");
     }
 
     public void stopArm() {

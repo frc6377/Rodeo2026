@@ -14,7 +14,7 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
-public class SalvageSim extends SalvageReal {
+public class SalvageSim implements SalvageIO {
     private SingleJointedArmSim armSim;
     private LoggedMechanism2d armMechanism2d;
     private LoggedMechanismRoot2d root;
@@ -57,6 +57,11 @@ public class SalvageSim extends SalvageReal {
         inputs.armCurrentAmps = armSim.getCurrentDrawAmps();
         inputs.intakeCurrentAmps = 2.0; // Simulated intake current
         inputs.atSetpoint = Math.abs(inputs.armPositionDegrees - armSetpoint) < SalvageArmConstants.PID.tolerance;
+
+        System.out.println("Salvage Sim - Angle: " + currentAngle
+                + " | Setpoint: " + armSetpoint
+                + " | Voltage: " + 2
+                + " | Velocity: " + inputs.armVelocityDegreesPerSec);
     }
 
     @Override
@@ -71,6 +76,8 @@ public class SalvageSim extends SalvageReal {
 
     @Override
     public void stopArm() {
+        // Stop the arm motor but keep the current setpoint
+        // This allows gravity compensation to continue working
         armSim.setInput(0.0);
     }
 

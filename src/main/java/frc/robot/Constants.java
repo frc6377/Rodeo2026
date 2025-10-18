@@ -112,7 +112,6 @@ public final class Constants {
     public final class SalvageArmConstants {
         // Arm Positions (setpoints)
         public static final Angle kArmIntakeAngle = Degrees.of(0);
-        public static final Angle kArmStowAngle = Degrees.of(63.244319);
         public static final Angle kArmFreightAngle = Degrees.of(43.750137);
 
         // Simulation constants
@@ -122,7 +121,7 @@ public final class Constants {
         public static final Distance kArmLength = Meters.of(0.5);
         public static final Angle kArmMinAngle = Degrees.of(-10); // Physical minimum
         public static final Angle kArmMaxAngle = Degrees.of(90); // Physical maximum
-        public static final Angle kArmStartAngle = kArmStowAngle; // Start at stow position
+        public static final Angle kArmStartAngle = kArmIntakeAngle; // Start at stow position
 
         // PID Constants
         public static class PID {
@@ -130,6 +129,13 @@ public final class Constants {
             public static final double kI = 0.0;
             public static final double kD = 0.0;
             public static final double tolerance = 2.0; // degrees
+        }
+
+        // Feedforward Constants
+        public static class Feedforward {
+            public static final double kS = 0.0; // Voltage to overcome static friction
+            public static final double kG = 0.4; // Voltage to counteract gravity (tuned for sim)
+            public static final double kV = 0.0; // Voltage per velocity
         }
 
         // Real robot Talon PID (currently unused, but configured on motor)
