@@ -1,8 +1,11 @@
 package frc.robot.subsystems.salvage;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import com.ctre.phoenix6.hardware.CANcoder;
 import frc.robot.Constants.MotorIDs;
 import frc.robot.Constants.SalvageArmConstants;
 import frc.robot.Constants.SensorIDs;
@@ -10,13 +13,13 @@ import frc.robot.Constants.SensorIDs;
 public class SalvageReal implements SalvageIO {
     private TalonSRX intakeMotor;
     private TalonSRX armMotor;
-    private DutyCycleEncoder salvagePivotEncoder;
+    private CANcoder salvagePivotEncoder;
     private double armSetpoint = 0.0;
 
     public SalvageReal() {
         intakeMotor = new TalonSRX(MotorIDs.salvageMotor);
         armMotor = new TalonSRX(MotorIDs.salvageArmMotor);
-        salvagePivotEncoder = new DutyCycleEncoder(SensorIDs.salvagePivotEncoder);
+        salvagePivotEncoder = new CANcoder(SensorIDs.salvagePivotEncoder);
 
         // Configure PID for arm motor (Talon onboard PID - currently unused)
         armMotor.config_kP(0, SalvageArmConstants.TalonPID.kP);
@@ -26,10 +29,16 @@ public class SalvageReal implements SalvageIO {
 
     @Override
     public void updateInputs(SalvageIOInputs inputs) {
-        inputs.armPositionDegrees = salvagePivotEncoder.get();
-        // inputs.armVelocityDegreesPerSec = salvagePivotEncoder.getVelocity().getValue().in(DegreesPerSecond);
-        inputs.armCurrentAmps = armMotor.getStatorCurrent();
-        inputs.intakeCurrentAmps = intakeMotor.getStatorCurrent();
+        // CANcoder returns rotations, convert to degrees
+        inputs.armPositionDegrees =
+                salvagePivotEncoder.getAbsolutePosition().getValue().in(Degrees);
+        inputs.armVelocityDegreesPerSec =
+                salvagePivotEncoder.getVelocity().getValue().in(DegreesPerSecond);
+
+        // TalonSRX uses getOutputCurrent() instead of getStatorCurrent()
+        inputs.armCurrentAmps = armMotor.getOutputCurrent();
+        inputs.intakeCurrentAmps = intakeMotor.getOutputCurrent();
+
         inputs.atSetpoint = Math.abs(inputs.armPositionDegrees - armSetpoint) < SalvageArmConstants.PID.tolerance;
 
         System.out.println("SalvageReal - Encoder: " + inputs.armPositionDegrees + " | Setpoint: " + armSetpoint);
@@ -38,7 +47,9 @@ public class SalvageReal implements SalvageIO {
     @Override
     public void setArmPosition(double degrees) {
         armSetpoint = degrees;
-        armMotor.set(ControlMode.Position, degrees);
+        // Note: Using manual control instead of Talon PID
+        // The actual PID control should be handled in the subsystem layer
+        // This is just storing the setpoint for reference
     }
 
     @Override
@@ -47,17 +58,19 @@ public class SalvageReal implements SalvageIO {
     }
 
     @Override
-    public void stopArm() {
-        armMotor.set(ControlMode.PercentOutput, 0.0);
+    public void setIntakeSpeed(double speed) {
+        intakeMotor.set(ControlMode.PercentOutput, speed);
     }
 
     @Override
-    public void setIntakeSpeed(double percentOutput) {
-        intakeMotor.set(ControlMode.PercentOutput, percentOutput);
+    public void stopArm() {
+        // Stop the arm motor but keep the current setpoint
+        // This allows gravity compensation to continue working
+        armMotor.set(ControlMode.PercentOutput, 0);
     }
 
     @Override
     public void stopIntake() {
-        intakeMotor.set(ControlMode.PercentOutput, 0.0);
+        intakeMotor.set(ControlMode.PercentOutput, 0);
     }
 }
