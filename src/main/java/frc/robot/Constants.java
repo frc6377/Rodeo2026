@@ -64,9 +64,9 @@ public final class Constants {
 
         public static class PID {
             // Tuned to reduce overshoot
-            public static final double kP = 0.05; // Reduced from 0.1 for less aggressive movement
+            public static final double kP = 0.08; // Reduced from 0.1 for less aggressive movement
             public static final double kI = 0.0; // Keep at 0 to prevent integral windup
-            public static final double kD = 0.08; // Increased from 0.01 to add damping and prevent overshoot
+            public static final double kD = 0.03; // Increased from 0.01 to add damping and prevent overshoot
         }
 
         public static class FEEDFORWARD {
