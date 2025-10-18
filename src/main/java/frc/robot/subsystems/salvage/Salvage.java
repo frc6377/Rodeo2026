@@ -106,7 +106,8 @@ public class Salvage extends SubsystemBase {
     // 2 setpoints: intake, freight
     public enum Setpoint {
         INTAKE(SalvageArmConstants.kArmIntakeAngle),
-        FREIGHT(SalvageArmConstants.kArmFreightAngle);
+        FREIGHT(SalvageArmConstants.kArmFreightAngle),
+        ZERO(Degrees.of(0));
 
         private final Angle angle;
 
@@ -147,29 +148,29 @@ public class Salvage extends SubsystemBase {
     }
 
     /**
-     * Toggle between INTAKE (0°) and FREIGHT (43.75°) 
-     * Simple: just toggle the state variable and the default command will handle movement
+     * Toggle between INTAKE (0°) and FREIGHT (43.75°) Simple: just toggle the state variable and the default command
+     * will handle movement
      */
     public Command toggleArmPositionCommand() {
         return Commands.runOnce(() -> {
-            // Toggle the target setpoint
-            if (targetSetpoint == Setpoint.INTAKE) {
-                targetSetpoint = Setpoint.FREIGHT;
-            } else {
-                targetSetpoint = Setpoint.INTAKE;
-            }
-            
-            System.out.println("============================================");
-            System.out.println("TOGGLED TO: " + targetSetpoint.name() + " (" + targetSetpoint.getAngle().in(Degrees) + "°)");
-            System.out.println("CURRENT ANGLE: " + getCurrentAngle().in(Degrees) + "°");
-            System.out.println("============================================");
-        }).withName("Toggle Salvage Arm");
+                    // Toggle the target setpoint
+                    if (targetSetpoint == Setpoint.INTAKE) {
+                        targetSetpoint = Setpoint.FREIGHT;
+                    } else {
+                        targetSetpoint = Setpoint.INTAKE;
+                    }
+
+                    System.out.println("============================================");
+                    System.out.println("TOGGLED TO: " + targetSetpoint.name() + " ("
+                            + targetSetpoint.getAngle().in(Degrees) + "°)");
+                    System.out.println("CURRENT ANGLE: " + getCurrentAngle().in(Degrees) + "°");
+                    System.out.println("============================================");
+                })
+                .withName("Toggle Salvage Arm");
     }
 
-    /**
-     * Default command - always drives arm to the target setpoint (INTAKE or FREIGHT)
-     */
-    private Command holdSetpointCommand() {
+    /** Default command - always drives arm to the target setpoint (INTAKE or FREIGHT) */
+    public Command holdSetpointCommand() {
         return Commands.run(
                 () -> {
                     double targetAngle = targetSetpoint.getAngle().in(Degrees);
@@ -177,17 +178,15 @@ public class Salvage extends SubsystemBase {
                     double pidOutput = armPIDController.calculate(currentAngle, targetAngle);
                     double feedforward = calculateFeedforward(currentAngle);
                     double totalVoltage = (pidOutput + feedforward) * 12.0;
-                    
+
                     SmartDashboard.putNumber("Salvage/Target Setpoint", targetAngle);
                     SmartDashboard.putNumber("Salvage/PID Output", pidOutput);
                     SmartDashboard.putNumber("Salvage/Total Voltage", totalVoltage);
-                    
+
                     io.setArmVoltage(totalVoltage);
                 },
                 this);
     }
-
-
 
     public void stopArm() {
         io.stopArm();
