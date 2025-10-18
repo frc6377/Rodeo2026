@@ -126,7 +126,7 @@ public class RobotContainer {
         // Salvage - Toggle arm between INTAKE (0°) and FREIGHT (43.75°)
         // Simple toggle - just switches the target, default command handles movement
 
-        controller.salvageToggle().onTrue(salvage.toggleArmPositionCommand());
+        // controller.salvageToggle().onTrue(salvage.toggleArmPositionCommand());
         controller.pivotSalvageUp().whileTrue(salvage.pivotUpCommand());
         controller.pivotSalvageDown().whileTrue(salvage.pivotDownCommand());
         controller.salvageIntake().whileTrue(salvage.intakeCommand());

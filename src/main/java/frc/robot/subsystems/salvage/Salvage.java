@@ -25,7 +25,6 @@ public class Salvage extends SubsystemBase {
         // No continuous input - arm doesn't do full rotations
 
         // Set default command to hold at the target setpoint (INTAKE or FREIGHT)
-        setDefaultCommand(holdSetpointCommand());
     }
 
     @Override
@@ -138,7 +137,7 @@ public class Salvage extends SubsystemBase {
         Setpoint closerSetpoint = distanceToIntake < distanceToFreight ? Setpoint.INTAKE : Setpoint.FREIGHT;
 
         return toggleArmPositionCommand();
-    } 
+    }
 
     /**
      * Toggle between INTAKE (0°) and FREIGHT (43.75°) Simple: just toggle the state variable and the default command
@@ -153,16 +152,7 @@ public class Salvage extends SubsystemBase {
                         targetSetpoint = Setpoint.INTAKE;
                     }
 
-                    double currentAngle = getCurrentAngle().in(Degrees);
-                    double intakeAngle = Setpoint.INTAKE.getAngle().in(Degrees);
-                    double freightAngle = Setpoint.FREIGHT.getAngle().in(Degrees);
-
-                    double distanceToIntake = Math.abs(currentAngle - intakeAngle);
-                    double distanceToFreight = Math.abs(currentAngle - freightAngle);
-
-                    targetSetpoint = distanceToIntake < distanceToFreight ? Setpoint.INTAKE : Setpoint.FREIGHT;
-
-                    
+                    io.setArmPosition(targetSetpoint.getAngle().in(Degrees));
                 })
                 .withName("Toggle Salvage Arm");
     }

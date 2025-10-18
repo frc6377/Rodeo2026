@@ -4,10 +4,10 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix6.hardware.CANcoder;
-
 import edu.wpi.first.math.controller.PIDController;
 import frc.robot.Constants.MotorIDs;
 import frc.robot.Constants.SalvageArmConstants;
@@ -24,6 +24,7 @@ public class SalvageReal implements SalvageIO {
     public SalvageReal() {
         intakeMotor = new TalonSRX(MotorIDs.salvageMotor);
         armMotor = new TalonSRX(MotorIDs.salvageArmMotor);
+        armMotor.setNeutralMode(NeutralMode.Brake);
         salvagePivotEncoder = new CANcoder(SensorIDs.salvagePivotEncoder);
 
         pid = new PIDController(1, 0, 2);
