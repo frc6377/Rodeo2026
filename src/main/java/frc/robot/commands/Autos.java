@@ -20,11 +20,11 @@ public final class Autos {
         int turnDegrees = 30;
         double scaler = 1;
         return Commands.sequence(
-                        driveSubsystem.setForwardCommand(2.5*scaler, 0.45),
+                        driveSubsystem.setForwardCommand(2.5 * scaler, 0.45),
                         driveSubsystem.turnCommand(turnDegrees).withTimeout(2),
-                        driveSubsystem.setForwardCommand(4*scaler, 0.45),
+                        driveSubsystem.setForwardCommand(4 * scaler, 0.45),
                         driveSubsystem.turnCommand(-turnDegrees).withTimeout(2),
-                        driveSubsystem.setForwardCommand(2*scaler, 0.45),
+                        driveSubsystem.setForwardCommand(2 * scaler, 0.45),
                         salvageSubsystem.moveArmCommand(Salvage.Setpoint.FREIGHT),
                         salvageSubsystem.holdArmPositionCommand(),
                         salvageSubsystem.outtakeCommand())
@@ -40,13 +40,13 @@ public final class Autos {
         int turnDegrees = 30;
         double scaler = 1;
         return Commands.sequence(
-                        driveSubsystem.setForwardCommand(1.5*scaler, 0.45),
+                        driveSubsystem.setForwardCommand(1.5 * scaler, 0.45),
                         driveSubsystem.turnCommand(-15).withTimeout(2),
-                        driveSubsystem.setForwardCommand(2*scaler, 0.45),
+                        driveSubsystem.setForwardCommand(2 * scaler, 0.45),
                         driveSubsystem.turnCommand(turnDegrees + 15).withTimeout(2),
-                        driveSubsystem.setForwardCommand(4*scaler, 0.45),
+                        driveSubsystem.setForwardCommand(4 * scaler, 0.45),
                         driveSubsystem.turnCommand(-turnDegrees).withTimeout(2),
-                        driveSubsystem.setForwardCommand(1*scaler, 0.45),
+                        driveSubsystem.setForwardCommand(1 * scaler, 0.45),
                         salvageSubsystem.moveArmCommand(Salvage.Setpoint.FREIGHT),
                         salvageSubsystem.holdArmPositionCommand(),
                         salvageSubsystem.outtakeCommand())

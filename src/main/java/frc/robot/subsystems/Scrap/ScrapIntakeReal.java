@@ -2,6 +2,7 @@ package frc.robot.subsystems.scrap;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
@@ -9,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix6.hardware.CANcoder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.MotorIDs;
@@ -19,7 +21,7 @@ public class ScrapIntakeReal implements ScrapIntakeIO {
 
     protected TalonSRX intakeMotor;
     protected TalonSRX pivotMotor;
-    protected CANcoder pivotEncoder;
+    protected DutyCycleEncoder pivotEncoder;
     protected double armSetpoint = 0.0;
 
     private PIDController pidController;
@@ -30,15 +32,15 @@ public class ScrapIntakeReal implements ScrapIntakeIO {
         pivotMotor.config_kP(0, 0.1);
         pivotMotor.config_kI(0, 0.0);
         pivotMotor.config_kD(0, 0.0);
-        pivotEncoder = new CANcoder(MotorIDs.pivotEncoderID);
+        pivotEncoder = new DutyCycleEncoder(MotorIDs.pivotEncoderID, 1, ScrapArmConstants.kArmMinAngle.in(Rotations));
 
         pidController = new PIDController(ScrapArmConstants.PID.kP, ScrapArmConstants.PID.kI, ScrapArmConstants.PID.kD);
     }
 
     @Override
     public void updateInputs(ScrapIntakeIOInputs inputs) {
-        inputs.armPositionDegrees = pivotEncoder.getPosition().getValue().in(Degrees);
-        inputs.armVelocityDegreesPerSec = pivotEncoder.getVelocity().getValue().in(DegreesPerSecond);
+        inputs.armPositionDegrees = pivotEncoder.get();
+        // inputs.armVelocityDegreesPerSec = pivotEncoder.getVelocity().getValue().in(DegreesPerSecond);  
         inputs.armCurrentAmps = pivotMotor.getStatorCurrent();
         inputs.rollerCurrentAmps = intakeMotor.getStatorCurrent();
         inputs.atSetpoint = Math.abs(inputs.armPositionDegrees - armSetpoint)
@@ -53,7 +55,7 @@ public class ScrapIntakeReal implements ScrapIntakeIO {
                 }),
                 Commands.run(() -> {
                     double output =
-                            pidController.calculate(pivotEncoder.getPosition().getValueAsDouble());
+                            pidController.calculate(pivotEncoder.get());
                     pivotMotor.set(ControlMode.PercentOutput, output);
                     Logger.recordOutput("ScrapIntake/Output", output);
                 })); // TODO: ADD ARM FEEDFORWARD
