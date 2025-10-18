@@ -26,7 +26,7 @@ public final class Autos {
                         driveSubsystem.turnCommand(-turnDegrees).withTimeout(2),
                         driveSubsystem.setForwardCommand(2 * scaler, 0.45),
                         salvageSubsystem.moveArmCommand(Salvage.Setpoint.FREIGHT),
-                        salvageSubsystem.holdArmPositionCommand(),
+                        salvageSubsystem.holdSetpointCommand(),
                         salvageSubsystem.outtakeCommand())
                 .withName("LeftScoreAuto");
     }
@@ -48,7 +48,7 @@ public final class Autos {
                         driveSubsystem.turnCommand(-turnDegrees).withTimeout(2),
                         driveSubsystem.setForwardCommand(1 * scaler, 0.45),
                         salvageSubsystem.moveArmCommand(Salvage.Setpoint.FREIGHT),
-                        salvageSubsystem.holdArmPositionCommand(),
+                        salvageSubsystem.holdSetpointCommand(),
                         salvageSubsystem.outtakeCommand())
                 .withName("CenterScoreAuto");
     }
