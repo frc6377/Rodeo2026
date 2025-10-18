@@ -1,7 +1,6 @@
 package frc.robot.util.OILayer;
 
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -10,8 +9,7 @@ import java.util.function.DoubleSupplier;
 public class OIKeyboard implements OI {
     private static final XboxController controller = new XboxController(0);
 
-    public OIKeyboard() {
-    }
+    public OIKeyboard() {}
 
     // *** Keyboard 0 Mappings ***
     // Axies

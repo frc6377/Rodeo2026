@@ -46,7 +46,8 @@ public class RobotContainer {
     private final Salvage salvage;
 
     // OI
-    private final OI controller = Constants.useKeyboard ? new OIKeyboard() : (Constants.isJared ? new OIXboxJared() : new OIXbox());
+    private final OI controller =
+            Constants.useKeyboard ? new OIKeyboard() : (Constants.isJared ? new OIXboxJared() : new OIXbox());
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;

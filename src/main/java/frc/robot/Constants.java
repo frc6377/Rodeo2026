@@ -52,8 +52,8 @@ public final class Constants {
         // Simulation constants
         public static final DCMotor kArmMotor = DCMotor.getCIM(2);
         public static final double kArmGearing = 40;
-        public static final Angle kArmMinAngle = Degrees.of(0); // 0 degrees
-        public static final Angle kArmMaxAngle = Degrees.of(90); // 90 degrees
+        public static final Angle kArmMinAngle = Degrees.of(-10); // Allow negative angles for intake
+        public static final Angle kArmMaxAngle = Degrees.of(100); // Maximum stow position
         public static final Distance kArmLength = Inches.of(25.88);
         public static final Angle kArmBaseAngle = Degrees.of(0);
         public static final Angle kArmScoringAngle = Degrees.of(-45); // -45 degrees
@@ -63,9 +63,10 @@ public final class Constants {
                 kArmLength.in(Meters), Pounds.of(10).in(Kilograms));
 
         public static class PID {
-            public static final double kP = 0.1;
-            public static final double kI = 0.0;
-            public static final double kD = 0.01;
+            // Tuned to reduce overshoot
+            public static final double kP = 0.05; // Reduced from 0.1 for less aggressive movement
+            public static final double kI = 0.0; // Keep at 0 to prevent integral windup
+            public static final double kD = 0.08; // Increased from 0.01 to add damping and prevent overshoot
         }
 
         public static class FEEDFORWARD {
@@ -90,7 +91,7 @@ public final class Constants {
         // Scrap Motors IDs
         public static final int intakeMotorID = 6;
         public static final int pivotMotorID = 7;
-        public static final int pivotEncoderID = 12;
+        public static final int pivotEncoderID = 5;
         public static final int shooterMotor1ID = 10;
         public static final int shooterMotor2ID = 11;
 
