@@ -4,8 +4,11 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix6.hardware.CANcoder;
+
+import edu.wpi.first.math.controller.PIDController;
 import frc.robot.Constants.MotorIDs;
 import frc.robot.Constants.SalvageArmConstants;
 import frc.robot.Constants.SensorIDs;
@@ -16,10 +19,14 @@ public class SalvageReal implements SalvageIO {
     private CANcoder salvagePivotEncoder;
     private double armSetpoint = 0.0;
 
+    private PIDController pid;
+
     public SalvageReal() {
         intakeMotor = new TalonSRX(MotorIDs.salvageMotor);
         armMotor = new TalonSRX(MotorIDs.salvageArmMotor);
         salvagePivotEncoder = new CANcoder(SensorIDs.salvagePivotEncoder);
+
+        pid = new PIDController(1, 0, 2);
 
         // Configure PID for arm motor (Talon onboard PID - currently unused)
         armMotor.config_kP(0, SalvageArmConstants.TalonPID.kP);
@@ -46,6 +53,8 @@ public class SalvageReal implements SalvageIO {
 
     @Override
     public void setArmPosition(double degrees) {
+        double output = pid.calculate(salvagePivotEncoder.getAbsolutePosition().getValueAsDouble(), degrees);
+        setArmSpeed(output);
         armSetpoint = degrees;
     }
 
@@ -56,6 +65,8 @@ public class SalvageReal implements SalvageIO {
 
     @Override
     public void setArmSpeed(double degreesPerSec) {
+
+        armMotor.set(TalonSRXControlMode.PercentOutput, degreesPerSec);
     }
 
     @Override

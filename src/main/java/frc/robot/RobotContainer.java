@@ -48,6 +48,9 @@ public class RobotContainer {
     private final OI controller =
             Constants.useKeyboard ? new OIKeyboard() : (Constants.isJared ? new OIXboxJared() : new OIXbox());
 
+    // Controller
+    // private final XboxController controller = new XboxController(0);
+
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
 
@@ -91,6 +94,7 @@ public class RobotContainer {
         autoChooser.addOption(auto2.getName(), auto2);
 
         Command auto3 = Autos.LeaveDockAuto(drive, salvage, scrapIntake, null);
+        Command auto3 = Autos.LeaveDockAuto(drive, salvage, scrapIntake, null);
         autoChooser.addOption(auto3.getName(), auto3);
 
         Command auto4 = Autos.ShootScrapAuto(drive, salvage, scrapIntake);
@@ -123,13 +127,9 @@ public class RobotContainer {
         // Salvage - Toggle arm between INTAKE (0°) and FREIGHT (43.75°)
         // Simple toggle - just switches the target, default command handles movement
 
-
-        // Salvage toggle
-        // Salvage intake
-        // Salvage outake
-        controller.salvageToggle().onTrue(salvage.toggleArmPositionCommand());
-        controller.salvageIntake().whileTrue(salvage.intakeCommand());
-        controller.salvageOuttake().whileTrue(salvage.outtakeCommand());
+        controller.salvageIntake().onTrue(salvage.toggleArmPositionCommand());
+        controller.pivotSalvageUp().whileTrue(salvage.pivotUpCommand());
+        controller.pivotSalvageDown().whileTrue(salvage.pivotDownCommand());
     }
 
     /**
