@@ -119,6 +119,9 @@ public class RobotContainer {
 
         // Shooter
         controller.shooterOuttake().whileTrue(scrapShooter.shootScrap());
+
+        // Salvage - Toggle arm between INTAKE (0°) and FREIGHT (43.75°)
+        // Simple toggle - just switches the target, default command handles movement
         controller.salvageIntake().onTrue(salvage.toggleArmPositionCommand());
     }
 
