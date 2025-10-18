@@ -41,7 +41,7 @@ public class ArmSubsystem extends SubsystemBase {
     public ArmSubsystem() {
         m_armMotor = new TalonSRX(6);
         m_armMotor.setNeutralMode(NeutralMode.Brake);
-        m_armEncoder = new DutyCycleEncoder(1);
+        m_armEncoder = new DutyCycleEncoder(1, 1.0, .0);
 
         armPID = new PIDController(1, 0, 0);
         armFeedforward = new ArmFeedforward(0, 0, 0, 0);
@@ -84,7 +84,7 @@ public class ArmSubsystem extends SubsystemBase {
     public Angle getArmAngle() {
         return Robot.isSimulation()
                 ? Radians.of(m_armEncoderSim.get())
-                : Radians.of(m_armEncoder.get() + armConstants.Offset.in(Radians));
+                : Rotations.of(m_armEncoder.get());
     }
 
     public Command setArmCommand(Angle target) {
