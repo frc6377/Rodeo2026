@@ -21,7 +21,7 @@ public class ScrapShooter extends SubsystemBase {
         return Commands.runEnd(
                 () -> {
                     shooterMotor1.set(TalonSRXControlMode.Current, 1);
-                    shooterMotor2.set(TalonSRXControlMode.Current, 1);
+                    shooterMotor2.set(TalonSRXControlMode.Current, -1);
                 },
                 () -> {
                     stopShooter();
@@ -32,7 +32,7 @@ public class ScrapShooter extends SubsystemBase {
         return Commands.run(
                 () -> {
                     shooterMotor1.set(TalonSRXControlMode.Current, speed);
-                    shooterMotor2.set(TalonSRXControlMode.Current, speed);
+                    shooterMotor2.set(TalonSRXControlMode.Current, -speed);
                 },
                 this);
     }
