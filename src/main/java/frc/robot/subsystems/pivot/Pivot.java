@@ -8,7 +8,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -66,10 +66,10 @@ public class Pivot extends SubsystemBase {
         pivotPID = new PIDController(.01, 0, 0);
         pivotFeedforward = new ArmFeedforward(0, 0, 0, 0);
 
-        tuneP = new LoggedNetworkNumber("Pivot/PID/P");
+        tuneP = new LoggedNetworkNumber("Pivot/PID/P", 0);
         tuneI = new LoggedNetworkNumber("Pivot/PID/I");
         tuneD = new LoggedNetworkNumber("Pivot/PID/D");
-        tuneKG = new LoggedNetworkNumber("Pivot/PID/KG");
+        tuneKG = new LoggedNetworkNumber("Pivot/PID/KG", 0.01);
 
         motorVelocity = DegreesPerSecond.of(0);
         pastMotor = Radians.of(encoder.get());
@@ -96,7 +96,7 @@ public class Pivot extends SubsystemBase {
     public Angle getPivotAngle() {
         return Robot.isSimulation()
                 ? Radians.of(encoderSim.get())
-                : Radians.of(encoder.get() + PivotConstants.kOffset.in(Radians));
+                : Rotations.of(encoder.get() + PivotConstants.kOffset.in(Rotations));
     }
 
     public AngularVelocity getPivotVel() {
@@ -129,6 +129,14 @@ public class Pivot extends SubsystemBase {
         return pivotToPose(PivotConstants.kScoredPose).withName("scorePoseCommand");
     }
 
+    public Command stopPivot() {
+        return Commands.runOnce(
+                () -> {
+                    pivotMotor.set(ControlMode.PercentOutput, 0);
+                },
+                this);
+    }
+
     public Command testCommand() {
         return Commands.run(
                         () -> {
@@ -142,7 +150,7 @@ public class Pivot extends SubsystemBase {
     public void periodic() {
         // This method will be called once per scheduler run
         Logger.recordOutput("Pivot/Motor Percent", pivotMotor.getMotorOutputPercent());
-        Logger.recordOutput("Pivot/Encoder Angle Deg", getPivotAngle().in(Degrees));
+        Logger.recordOutput("Pivot/Pivot Angle Deg", getPivotAngle().in(Degrees));
         Logger.recordOutput(
                 "Pivot/PivotCommand",
                 getCurrentCommand() != null ? getCurrentCommand().getName() : "No Command");
@@ -159,12 +167,13 @@ public class Pivot extends SubsystemBase {
         Logger.recordOutput("Pivot/PID/P", pivotPID.getP());
         Logger.recordOutput("Pivot/PID/I", pivotPID.getI());
         Logger.recordOutput("Pivot/PID/D", pivotPID.getD());
+        Logger.recordOutput("Pivot/PID/KG", pivotFeedforward.getKg());
 
         // Logger.recordOutput("Pivot/PID/tuneP", tuneP.get());
 
-        motorVelocity = RadiansPerSecond.of(encoder.get() - pastMotor.in(Radians) * (5));
+        // motorVelocity = RadiansPerSecond.of(encoder.get() - pastMotor.in(Radians) * (5));
 
-        pastMotor = Radians.of(encoder.get());
+        // pastMotor = Radians.of(encoder.get());
     }
 
     @Override

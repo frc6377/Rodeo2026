@@ -50,11 +50,10 @@ public final class Constants {
         public static final int scrapIntakeMotor2 = 7;
 
         // Salvage Intake
-        public static final int salvageIntakeMotor = 8;
+        public static final int salvageIntakeMotor = 5;
 
         // Pivot
-        public static final int pivotMotor = 9;
-        public static final int pivotEncoder = 10;
+        public static final int pivotMotor = 6;
     }
 
     public final class DIOConstants {

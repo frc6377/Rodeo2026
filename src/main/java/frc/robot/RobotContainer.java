@@ -94,12 +94,12 @@ public class RobotContainer {
         final Runnable resetGyro = () -> {};
         controller.zeroDrivebase().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
+        // controller.scrapIntake().whileTrue(scrapIntake.intakeCommand());
+        // controller.scrapIntake().whileTrue(scrapIntake.outtakeCommand());
         controller.salvageIntake().whileTrue(salvageIntake.intakeCommand());
         controller.salvageIntake().whileTrue(salvageIntake.outtakeCommand());
-        controller.scrapIntake().whileTrue(scrapIntake.intakeCommand());
-        controller.scrapIntake().whileTrue(scrapIntake.outtakeCommand());
-        controller.pivotStow().whileTrue(pivot.stowedPoseCommand());
-        controller.pivotScore().whileTrue(pivot.scorePoseCommand());
+        controller.pivotStow().whileTrue(pivot.stowedPoseCommand()).onFalse(pivot.stopPivot());
+        controller.pivotScore().whileTrue(pivot.scorePoseCommand()).onFalse(pivot.stopPivot());
         controller.test().whileTrue(pivot.testCommand());
     }
 
