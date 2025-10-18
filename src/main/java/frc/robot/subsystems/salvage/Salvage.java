@@ -78,15 +78,7 @@ public class Salvage extends SubsystemBase {
         // When button released: stop roller but hold arm position with gravity compensation
         return Commands.runEnd(
                         () -> {
-                            double currentAngle = getCurrentAngle().in(Degrees);
-                            double intakeAngle = Setpoint.INTAKE.getAngle().in(Degrees);
-                            double freightAngle = Setpoint.FREIGHT.getAngle().in(Degrees);
-
                             moveArmCommand(Setpoint.FREIGHT).execute();
-
-                            double pidOutput = armPIDController.calculate(currentAngle, targetAngle);
-                            double feedforward = calculateFeedforward(currentAngle);
-                            io.setArmVoltage((pidOutput + feedforward) * 12.0);
                             io.setIntakeSpeed(-1.0); // Negative for outtake
                         },
                         () -> {
@@ -101,7 +93,6 @@ public class Salvage extends SubsystemBase {
         return Commands.runEnd(
                         () -> {
                             moveArmCommand(Setpoint.INTAKE).execute();
-                            holdSetpointCommand().execute();
                             io.setIntakeSpeed(1.0); // Positive for intake
                         },
                         () -> {
@@ -110,7 +101,7 @@ public class Salvage extends SubsystemBase {
                         },
                         this)
                 .withName("SalvageIntake");
-    }    
+    }
 
     // 2 setpoints: intake, freight
     public enum Setpoint {

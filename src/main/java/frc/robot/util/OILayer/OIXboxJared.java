@@ -7,13 +7,13 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.function.DoubleSupplier;
 
 /*
- * For Jared
- *     intake salv left trig'
-    score rig trig
-    riase salv arm right bump
-    lower on left bump
- * 
- */
+* For Jared
+*     intake salv left trig'
+   score rig trig
+   riase salv arm right bump
+   lower on left bump
+*
+*/
 
 public class OIXboxJared implements OI {
     private static final double triggerThreshold = 0.5;
