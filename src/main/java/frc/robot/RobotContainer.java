@@ -127,7 +127,6 @@ public class RobotContainer {
         // Simple toggle - just switches the target, default command handles movement
 
         controller.salvageIntake().onTrue(salvage.toggleArmPositionCommand());
-        controller.salvageScore().whileTrue(salvage.salvageScore());
         controller.pivotSalvageUp().whileTrue(salvage.pivotUpCommand());
         controller.pivotSalvageDown().whileTrue(salvage.pivotDownCommand());
     }
