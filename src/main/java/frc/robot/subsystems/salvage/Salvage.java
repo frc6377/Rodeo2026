@@ -121,30 +121,22 @@ public class Salvage extends SubsystemBase {
     }
 
     public Command moveArmCommand(Setpoint setpoint) {
-        return Commands.runOnce(() -> {
-                    // Reset the PID controller for a fresh start
-                    double targetAngle = setpoint.getAngle().in(Degrees);
-                    System.out.println("============================================");
-                    System.out.println("MOVING ARM TO: " + setpoint.name());
-                    System.out.println("TARGET ANGLE: " + targetAngle + "°");
-                    System.out.println("CURRENT ANGLE: " + getCurrentAngle().in(Degrees) + "°");
-                    System.out.println("============================================");
-                    armPIDController.reset();
-                })
-                .andThen(Commands.run(
-                                () -> {
-                                    double targetAngle = setpoint.getAngle().in(Degrees);
-                                    double currentAngle = getCurrentAngle().in(Degrees);
-                                    double pidOutput = armPIDController.calculate(currentAngle, targetAngle);
-                                    double feedforward = calculateFeedforward(currentAngle);
-                                    double totalVoltage = (pidOutput + feedforward) * 12.0;
-                                    SmartDashboard.putNumber("Salvage/Target Angle", targetAngle);
-                                    SmartDashboard.putNumber("Salvage/PID Output", pidOutput);
-                                    SmartDashboard.putNumber("Salvage/Total Voltage", totalVoltage);
-                                    io.setArmVoltage(totalVoltage);
-                                },
-                                this)
-                        .until(() -> armPIDController.atSetpoint()));
+        // Determine which setpoint we're closer to
+        targetSetpoint = setpoint; // Update target setpoint for default command
+        double currentAngle = getCurrentAngle().in(Degrees);
+        double intakeAngle = Setpoint.INTAKE.getAngle().in(Degrees);
+        double freightAngle = Setpoint.FREIGHT.getAngle().in(Degrees);
+
+        double distanceToIntake = Math.abs(currentAngle - intakeAngle);
+        double distanceToFreight = Math.abs(currentAngle - freightAngle);
+
+        Setpoint closerSetpoint = distanceToIntake < distanceToFreight ? Setpoint.INTAKE : Setpoint.FREIGHT;
+
+        if (closerSetpoint == setpoint && distanceToIntake < SalvageArmConstants.PID.tolerance) {
+            return Commands.none();
+        }
+
+        return toggleArmPositionCommand();
     }
 
     /**
