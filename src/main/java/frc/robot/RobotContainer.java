@@ -75,6 +75,7 @@ public class RobotContainer {
 
         // Set up SysId routines
         autoChooser.addOption("Test Auto", drive.setForwardCommand(2, .7));
+        autoChooser.addOption("Nothing Auto", Commands.none());
         // .andThen(armSubsystem.floorPickupCommand())
         // .until(() -> armSubsystem.getArmAngle().in(Rotations) < .1)
         // .andThen(intakeSubsystem.setIntakeCommand(1.5, .6))

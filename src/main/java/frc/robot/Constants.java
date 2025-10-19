@@ -66,7 +66,7 @@ public final class Constants {
     }
 
     public static class intakeConstants {
-        public static final double intakePercent = 1;
+        public static final double intakePercent = .85;
 
         // Simulation Constants
         public static final DCMotor kIntakeGearbox = DCMotor.getMiniCIM(2);

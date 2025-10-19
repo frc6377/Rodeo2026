@@ -45,7 +45,7 @@ public class ArmSubsystem extends SubsystemBase {
         m_armMotor = new VictorSPX(8);
         m_armMotor.setNeutralMode(NeutralMode.Brake);
         m_armMotor.setInverted(InvertType.InvertMotorOutput);
-        m_armEncoder = new DutyCycleEncoder(0, 1.0, .986);
+        m_armEncoder = new DutyCycleEncoder(0, 1.0, .983);
 
         armPID = new PIDController(.02, 0, 0);
         armFeedforward = new ArmFeedforward(0, 0, 0, 0);
@@ -71,7 +71,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public Command scoreSalvageCommand() {
-        return setArmCommand(Degrees.of(45));
+        return setArmCommand(Degrees.of(40));
     }
 
     public Command floorPickupCommand() {
@@ -95,6 +95,11 @@ public class ArmSubsystem extends SubsystemBase {
                                 () -> {
                                     double output =
                                             armPID.calculate(getArmAngle().in(Degrees));
+                                    if (getArmAngle().in(Rotations) > .9) {
+                                        output = armPID.calculate(getArmAngle().in(Degrees) - 360);
+                                    } else {
+                                        output = armPID.calculate(getArmAngle().in(Degrees));
+                                    }
                                     double armFF = armFeedforward.calculate(target.in(Radians), 0);
                                     m_armMotor.set(ControlMode.PercentOutput, output + armFF);
                                     Logger.recordOutput("Arm/Output", output);

@@ -82,11 +82,11 @@ public class Drive extends SubsystemBase {
 
     // Functions
     public void setLeftPercent(double percent) {
-        leftDriveMotor1.set(ControlMode.PercentOutput, percent);
+        leftDriveMotor2.set(ControlMode.PercentOutput, percent);
     }
 
     public void setRightPercent(double percent) {
-        rightDriveMotor1.set(ControlMode.PercentOutput, percent);
+        rightDriveMotor2.set(ControlMode.PercentOutput, -percent);
     }
 
     public double getDriveAngleDeg() {

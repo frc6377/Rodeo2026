@@ -34,13 +34,13 @@ public class IntakeSubsystem extends SubsystemBase {
             double intakePercent =
                     -((leftTrigger.getAsDouble() - rightTrigger.getAsDouble()) * intakeConstants.intakePercent);
             m_intakeMotor1.set(ControlMode.PercentOutput, intakePercent);
-            m_intakeMotor2.set(ControlMode.PercentOutput, -intakePercent);
+            m_intakeMotor2.set(ControlMode.PercentOutput, intakePercent);
         });
     }
 
     public void setIntakePercent(double percent) {
         m_intakeMotor1.set(ControlMode.PercentOutput, percent);
-        m_intakeMotor2.set(ControlMode.PercentOutput, -percent);
+        m_intakeMotor2.set(ControlMode.PercentOutput, percent);
     }
 
     public Command setIntakeCommand(double sec, double percent) {
