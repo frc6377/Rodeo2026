@@ -62,7 +62,8 @@ public class SalvageReal implements SalvageIO {
     }
 
     public double calculateFF() {
-        double ff = armFF.calculate(salvagePivotEncoder.getAbsolutePosition().getValue().in(Degrees), armSetpoint);
+        double ff = armFF.calculate(
+                salvagePivotEncoder.getAbsolutePosition().getValue().in(Degrees), armSetpoint);
         Logger.recordOutput("Salvage/Feedforward", ff);
         return ff;
     }
@@ -70,7 +71,8 @@ public class SalvageReal implements SalvageIO {
     @Override
     public void setArmPosition(double degrees) {
         armSetpoint = degrees;
-        double pidOutput = pid.calculate(salvagePivotEncoder.getAbsolutePosition().getValueAsDouble(), degrees);
+        double pidOutput =
+                pid.calculate(salvagePivotEncoder.getAbsolutePosition().getValueAsDouble(), degrees);
         double ffOutput = calculateFF();
         double totalOutput = pidOutput + ffOutput;
         setArmSpeed(totalOutput);

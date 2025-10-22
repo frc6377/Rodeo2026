@@ -133,8 +133,8 @@ public final class Constants {
 
         // Feedforward Constants
         public static class Feedforward {
-            public static final double kS = 0.0; // Voltage to overcome static friction
-            public static final double kG = 0.4; // Voltage to counteract gravity (tuned for sim)
+            public static final double kS = 0.2; // Voltage to overcome static friction
+            public static final double kG = 1.75; // Voltage to counteract gravity (tuned for sim)
             public static final double kV = 0.0; // Voltage per velocity
         }
 
