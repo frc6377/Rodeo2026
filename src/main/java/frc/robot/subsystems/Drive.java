@@ -162,8 +162,8 @@ public class Drive extends SubsystemBase {
     @Override
     public void simulationPeriodic() {
         m_differentialDrivetrainSim.setInputs(
-                leftDriveMotor1.getMotorOutputPercent() * RobotController.getBatteryVoltage(),
-                rightDriveMotor1.getMotorOutputPercent() * RobotController.getBatteryVoltage());
+                leftDriveMotor2.getMotorOutputPercent() * RobotController.getBatteryVoltage(),
+                rightDriveMotor2.getMotorOutputPercent() * RobotController.getBatteryVoltage() * -1);
         m_differentialDrivetrainSim.update(0.02);
 
         m_field.setRobotPose(m_differentialDrivetrainSim.getPose());

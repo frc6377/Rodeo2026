@@ -57,7 +57,7 @@ public class ArmSubsystem extends SubsystemBase {
                     armConstants.kArmGearbox,
                     armConstants.kArmGearing,
                     SingleJointedArmSim.estimateMOI(
-                            armConstants.armLength.in(Meters), Pounds.of(10).in(Kilograms)),
+                            armConstants.armLength.in(Meters), Pounds.of(2).in(Kilograms)),
                     armConstants.armLength.in(Meters),
                     armConstants.armMinAngle.in(Radians),
                     armConstants.armMaxAngle.in(Radians),
@@ -71,11 +71,11 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public Command scoreSalvageCommand() {
-        return setArmCommand(Degrees.of(40));
+        return setArmCommand(Degrees.of(90));
     }
 
     public Command floorPickupCommand() {
-        return setArmCommand(Degrees.of(0.01));
+        return setArmCommand(Degrees.of(0));
     }
 
     public void setArmPercent(double percent) {
@@ -98,11 +98,16 @@ public class ArmSubsystem extends SubsystemBase {
                                     if (getArmAngle().in(Rotations) > .9) {
                                         output = armPID.calculate(getArmAngle().in(Degrees) - 360);
                                     } else {
+                                        if (Robot.isSimulation()) {
+                                            output = armPID.calculate(
+                                                    getArmAngle().in(Degrees) * 90 * .43865 / (2 * Math.PI));
+                                        }
                                         output = armPID.calculate(getArmAngle().in(Degrees));
                                     }
                                     double armFF = armFeedforward.calculate(target.in(Radians), 0);
                                     m_armMotor.set(ControlMode.PercentOutput, output + armFF);
                                     Logger.recordOutput("Arm/Output", output);
+                                    Logger.recordOutput("Arm/Target", target.in(Degrees));
                                     Logger.recordOutput("Arm/Feed Forward", armFF);
                                 },
                                 this))
@@ -126,6 +131,7 @@ public class ArmSubsystem extends SubsystemBase {
         m_armEncoderSim.set((simAngle).in(Rotations));
         Logger.recordOutput("Sim Angle in Radians", simAngle);
         Logger.recordOutput("Sim Angle in Degrees", simAngle.in(Degrees));
+        Logger.recordOutput("Arm/angle degrees", getArmAngle().in(Degrees) * 90 * .43865 / (2 * Math.PI));
         armMech.setAngle(simAngle.in(Degrees));
         Logger.recordOutput("Arm Mech", mech);
     }

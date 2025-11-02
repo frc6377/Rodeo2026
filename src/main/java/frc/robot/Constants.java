@@ -59,7 +59,7 @@ public final class Constants {
 
         // Simulation Constants
         public static final DCMotor kArmGearbox = DCMotor.getMiniCIM(1);
-        public static final Distance armLength = Inches.of(20);
+        public static final Distance armLength = Inches.of(5);
         public static final Mass k = Pounds.of(4.75);
         public static final Angle armMinAngle = Degrees.of(0);
         public static final Angle armMaxAngle = Degrees.of(90);
