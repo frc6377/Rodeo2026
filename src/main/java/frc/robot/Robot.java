@@ -29,6 +29,10 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project, you must also update the build.gradle file in the project.
  */
 public class Robot extends LoggedRobot {
+
+    //PREGENERATED THIS CODE IS PREGENERATED AND ALMOST NOTHING IN HERE WAS CHANGED
+    //ROBOTCONTAINER IS WHERE ALL THE COOL CONTROL STUFF HAPPENS
+
     private Command autonomousCommand;
     private RobotContainer robotContainer;
 

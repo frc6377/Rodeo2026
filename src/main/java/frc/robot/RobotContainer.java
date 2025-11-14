@@ -46,6 +46,7 @@ public class RobotContainer {
 
     private final OI controller =
             Constants.currentMode.equals(Constants.Mode.SIM) && Constants.useKeyboard ? new OIKeyboard() : new OIXbox();
+            //creates a keyboard to use for controls if the robot is in simulation and useKeybord is true else create an xbox controller
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
@@ -74,12 +75,17 @@ public class RobotContainer {
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", new SendableChooser<Command>());
 
         // Set up SysId routines
-        autoChooser.addOption("Test Auto", drive.setForwardCommand(2, .7));
+        autoChooser.addOption("Test Auto", drive.setForwardCommand(2, .7)
+        //drive forward for two seconds at 70% power
+        .andThen(armSubsystem.floorPickupCommand())
+        .until(() -> armSubsystem.getArmAngle().in(Rotations) < .05)
+        //run the arm motor down until it is basically at the floor
+        .andThen(intakeSubsystem.setIntakeCommand(1.5, .6))
+        //intake for 1.5 seconds at 60% power
+        .andThen(drive.setTurnCommand(.5, .5)));
+        //Turn for half a second at 50% power
         autoChooser.addOption("Nothing Auto", Commands.none());
-        // .andThen(armSubsystem.floorPickupCommand())
-        // .until(() -> armSubsystem.getArmAngle().in(Rotations) < .1)
-        // .andThen(intakeSubsystem.setIntakeCommand(1.5, .6))
-        // .andThen(drive.setTurnCommand(.5, .5)));
+
 
         // Configure the button bindings
         configureButtonBindings();
@@ -97,6 +103,7 @@ public class RobotContainer {
         // intaking commands
         m_driverController.a().onTrue(armSubsystem.floorPickupCommand());
         m_driverController.b().onTrue(armSubsystem.scoreSalvageCommand());
+        //Intake power is calculated using the combined value of both controller triggers
         intakeSubsystem.setDefaultCommand(intakeSubsystem.intakeCommand(
                 m_driverController::getLeftTriggerAxis, m_driverController::getRightTriggerAxis));
 

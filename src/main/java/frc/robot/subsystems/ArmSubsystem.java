@@ -1,11 +1,6 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Kilograms;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Pounds;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.InvertType;
@@ -29,7 +24,7 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 
 public class ArmSubsystem extends SubsystemBase {
-    // Add PIDController calculation to setArmMotor parameter
+    //creates objects
     private final VictorSPX m_armMotor;
     private final DutyCycleEncoder m_armEncoder;
 
@@ -42,6 +37,7 @@ public class ArmSubsystem extends SubsystemBase {
     private SingleJointedArmSim m_armSim;
 
     public ArmSubsystem() {
+        //initalize objects
         m_armMotor = new VictorSPX(8);
         m_armMotor.setNeutralMode(NeutralMode.Brake);
         m_armMotor.setInverted(InvertType.InvertMotorOutput);
@@ -51,6 +47,7 @@ public class ArmSubsystem extends SubsystemBase {
         armFeedforward = new ArmFeedforward(0, 0, 0, 0);
 
         if (Robot.isSimulation()) {
+            //initalizes simulation objects if robot is in sim mode
             m_armEncoderSim = new DutyCycleEncoderSim(m_armEncoder);
 
             m_armSim = new SingleJointedArmSim(
@@ -64,6 +61,7 @@ public class ArmSubsystem extends SubsystemBase {
                     true,
                     0);
 
+            //creates the window where simulated mechanisms can be seen
             armMech = mech.getRoot("root", 1, 0)
                     .append(new LoggedMechanismLigament2d("Arm Mech [0]", 1, 0, 10, new Color8Bit(Color.kPurple)));
             Logger.recordOutput("Arm Mech", mech);
@@ -71,7 +69,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public Command scoreSalvageCommand() {
-        return setArmCommand(Degrees.of(90));
+        return setArmCommand(Degrees.of(45));
     }
 
     public Command floorPickupCommand() {
@@ -88,6 +86,8 @@ public class ArmSubsystem extends SubsystemBase {
 
     public Command setArmCommand(Angle target) {
         return Commands.sequence(
+            //PID sequence to run motors at a smooth rate while still reaching a target angle quickly
+            //LOTS OF MATH, CALCULUS, AND PHYSICS ON THE BACKEND WHICH I WON'T EXPLAIN HERE
                         Commands.runOnce(() -> {
                             armPID.setSetpoint(target.in(Degrees));
                         }),
@@ -116,6 +116,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        //log what command is running the angle of the arm and the motor outputs
         Logger.recordOutput(
                 "Arm/Arm Subsystem command",
                 getCurrentCommand() == null ? "null" : getCurrentCommand().getName());
@@ -125,6 +126,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public void simulationPeriodic() {
+        //a bunch of values that only really matter for making simulation work as well as testing
         m_armSim.setInputVoltage(m_armMotor.getMotorOutputVoltage());
         m_armSim.update(Robot.defaultPeriodSecs);
         final Angle simAngle = Radians.of(m_armSim.getAngleRads());

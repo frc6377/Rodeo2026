@@ -19,10 +19,12 @@ public class IntakeSubsystem extends SubsystemBase {
     private FlywheelSim m_intakeSim;
 
     public IntakeSubsystem() {
+        //initalize motors
         m_intakeMotor1 = new TalonSRX(5);
         m_intakeMotor2 = new TalonSRX(6);
 
         if (Robot.isSimulation()) {
+            //create simulation if the robot is in sim mode
             m_intakeSim = new FlywheelSim(
                     LinearSystemId.createFlywheelSystem(intakeConstants.kIntakeGearbox, 1, 1),
                     intakeConstants.kIntakeGearbox);
@@ -46,6 +48,7 @@ public class IntakeSubsystem extends SubsystemBase {
     public Command setIntakeCommand(double sec, double percent) {
         return Commands.deadline(
                 Commands.waitSeconds(sec),
+                //runs at percent for sec before stopping
                 runEnd(
                         () -> {
                             setIntakePercent(percent);
@@ -57,6 +60,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        //Logs motor output relative to maximum output
         Logger.recordOutput("intake/Motor 1 Output", m_intakeMotor1.getMotorOutputPercent());
         Logger.recordOutput("intake/Motor 2 Output", m_intakeMotor2.getMotorOutputPercent());
     }
