@@ -1,0 +1,18 @@
+Hello, this is the header file which contains all the information about this program
+first the files: the only ones you should really care about are the files in the subsystems folder, constants, and robot container
+anywhere else likely is not important if you're unsure I left some comments in most of the files to say if they were or were not important
+
+second this is a custom library which is around a GB worth of storage to fully set up so actual footage of me using the program can be found here:
+https://drive.google.com/file/d/11bAQspT2ASuAtjfXeG3zl95DloRQ7bTr/view
+
+The controller I was using while recording had a bit of drift so that's why it's always turning
+
+Explanations for what every command and value do are usually given in comments near said command you can also glean a lot about what something
+does based off its name
+
+Finally and I cannot emphasize this enough STAY IN THE src\main\java\frc\robot folder group or you will get lost that folder is where all the 
+substance of this program is, nowhere else
+
+With all that being said happy parsing.
+
+- Endafnil
