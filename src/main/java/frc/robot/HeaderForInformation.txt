@@ -1,8 +1,17 @@
+This is my Howdy Bots robot rodeo code with more functions and comments then what I competed with
+
+I am Joshua Westbrook though Josh works better, though online it's Endafnil
+
+I am in the 4th period class comp sci III 
+
+This project seves as a basic introduction to how programming a robot works this is my 4th year using it so I skip the intro cutscene speedrun
+the tutorial and start making the cool stuff which is simulation and auton. That's the basics below is your info and suggestions
+
 Hello, this is the header file which contains all the information about this program
 first the files: the only ones you should really care about are the files in the subsystems folder, constants, and robot container
 anywhere else likely is not important if you're unsure I left some comments in most of the files to say if they were or were not important
 
-second this is a custom library which is around a GB worth of storage to fully set up so actual footage of me using the program can be found here:
+second this is a custom library which is around a GB worth of storage to fully set up so actual footage of me using the program sim can be found here:
 https://drive.google.com/file/d/11bAQspT2ASuAtjfXeG3zl95DloRQ7bTr/view
 
 The controller I was using while recording had a bit of drift so that's why it's always turning
