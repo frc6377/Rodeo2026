@@ -4,102 +4,76 @@
 
 package frc.robot.subsystems.Salvage;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Pounds;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.salvageConstants;
+import yams.mechanisms.config.ArmConfig;
+import yams.mechanisms.positional.Arm;
+import yams.motorcontrollers.SmartMotorControllerConfig;
+import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
+import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
+import yams.motorcontrollers.local.SparkWrapper;
 import frc.robot.Robot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
+import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 
 public class Salvage extends SubsystemBase {
     /** Creates a new salvage. */
-
     // Motors
-    private final TalonSRX salvagePivotLeader;
 
-    private final DutyCycleEncoder salvagePivotEncoder;
+    private final DutyCycleEncoder salvagePivotEncoder = new DutyCycleEncoder(Constants.SensorIDs.salvagePivotEncoder, 1, 0.6);
 
-    private final LoggedNetworkNumber pivotP;
-    private final LoggedNetworkNumber pivotI;
-    private final LoggedNetworkNumber pivotD;
 
-    private final boolean tune = true;
-
-    public static double resetValue = 0.61;
-
-    // Sensors
-    private final PIDController salvagePivotPID;
-
-    public Salvage() {
+    private final SparkMax salvagePivotMotor = new SparkMax(Constants.MotorIDs.salvagePivotLeader, MotorType.kBrushed);
         // Pivot Leader Motor
-        salvagePivotLeader = new TalonSRX(Constants.MotorIDs.salvagePivotLeader);
-        salvagePivotLeader.setInverted(false);
+    private final SmartMotorControllerConfig config = new SmartMotorControllerConfig(this)
+            .withClosedLoopController(salvageConstants.salvagePivotP,salvageConstants.salvagePivotI, salvageConstants.salvagePivotD)
+            .withSoftLimit(salvageConstants.SalvagePivotMinAngle, salvageConstants.SalvagePivotMaxAngle)
+            .withExternalEncoder(salvagePivotEncoder)
+            .withExternalEncoderGearing(45)
+            .withGearing(45)
+            .withTelemetry("Salvage/Pivot Motor",TelemetryVerbosity.HIGH)
+            .withStatorCurrentLimit(Amps.of(40))
+            .withFeedforward(new ArmFeedforward(0, 0, 0))
+            .withClosedLoopTolerance(salvageConstants.SalvagePivotTolerance)
+            .withControlMode(ControlMode.CLOSED_LOOP);
+            
+    private final SparkWrapper salvagePivotController = new SparkWrapper(salvagePivotMotor, DCMotor.getCIM(1), config);
 
-        // Tunable PID
-        pivotP = new LoggedNetworkNumber("Salvage/Pivot P", salvageConstants.salvagePivotP);
-        pivotI = new LoggedNetworkNumber("Salvage/Pivot I", salvageConstants.salvagePivotI);
-        pivotD = new LoggedNetworkNumber("Salvage/Pivot D", salvageConstants.salvagePivotD);
+    private ArmConfig salvagePivotArmConfig = new ArmConfig(salvagePivotController)
+            .withLength(Inches.of(24))
+            .withHardLimit(salvageConstants.SalvagePivotMinAngle, salvageConstants.SalvagePivotMaxAngle)
+            .withTelemetry("Salvage/Pivot Arm", TelemetryVerbosity.HIGH)
+            .withMass(Pounds.of(8))
+            .withStartingPosition(Constants.salvageConstants.SalvagePivotInitialAngle);
+    private final Arm salvageArm = new Arm(salvagePivotArmConfig);
+    public Salvage() {
 
-        // Sensors
-        salvagePivotEncoder = new DutyCycleEncoder(Constants.SensorIDs.salvagePivotEncoder, 1, 0.6);
-
-        if (tune) {
-            salvagePivotPID = new PIDController(
-                    salvageConstants.salvagePivotP, salvageConstants.salvagePivotI, salvageConstants.salvagePivotD);
-        } else {
-            salvagePivotPID = new PIDController(pivotP.get(), pivotI.get(), pivotD.get());
-        }
-
-        salvagePivotPID.setTolerance(salvageConstants.SalvagePivotTolerance.in(Degrees));
-        salvagePivotPID.setSetpoint(Constants.salvageConstants.SalvagePivotInitialAngle.in(Degrees));
     }
-
-    public Command update() {
-        return runOnce(() -> {
-            if (Math.abs(salvagePivotPID.getSetpoint() - getCurrentAngle().in(Degrees))
-                            > Constants.salvageConstants.SalvagePivotMaxAngle.in(Degrees)
-                    || Math.abs(salvagePivotPID.getSetpoint()
-                                    - getCurrentAngle().in(Degrees))
-                            < Constants.salvageConstants.SalvagePivotMinAngle.in(Degrees)) {
-                salvagePivotPID.setSetpoint(salvageConstants.SalvagePivotUpAngle.in(Degrees));
-            }
-            double output = salvagePivotPID.calculate(getCurrentAngle().in(Degrees));
-            salvagePivotLeader.set(ControlMode.PercentOutput, output);
-
-            if (tune) {
-                salvagePivotPID.setP(pivotP.get());
-                salvagePivotPID.setI(pivotI.get());
-                salvagePivotPID.setD(pivotD.get());
-            }
-
-            // Logging
-            Logger.recordOutput("Salvage/Pivot Setpoint", salvagePivotPID.getSetpoint());
-            Logger.recordOutput("Salvage/Pivot Angle", getCurrentAngle().in(Degrees));
-            Logger.recordOutput("Salvage/Pivot Leader Output", salvagePivotLeader.getMotorOutputPercent());
-            Logger.recordOutput("Salvage/Pivot At Setpoint", salvagePivotPID.atSetpoint());
-        });
-    }
-
     public Angle getCurrentAngle() {
         return Degrees.of(salvagePivotEncoder.get() * 360);
     }
 
     public Command setAngle(Angle angle) {
-        return Commands.runOnce(() -> {
-            double clampedAngle = Math.max(
-                    salvageConstants.SalvagePivotMinAngle.in(Degrees),
-                    Math.min(salvageConstants.SalvagePivotMaxAngle.in(Degrees), angle.in(Degrees)));
-            salvagePivotPID.setSetpoint(clampedAngle);
-        });
+        return salvageArm.setAngle(angle);
     }
 
     public Command goToStowAngle() {
@@ -120,17 +94,6 @@ public class Salvage extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (Robot.isReal()) {
-            update().schedule();
-        }
-
-        // TODO: Don't move the logging, logging doesnt work when its inside the update command
-        Logger.recordOutput("Salvage/Pivot Setpoint", salvagePivotPID.getSetpoint());
-        Logger.recordOutput("Salvage/Pivot Angle", getCurrentAngle().in(Degrees));
-        Logger.recordOutput("Salvage/Pivot Leader Output", salvagePivotLeader.getMotorOutputPercent());
-        Logger.recordOutput("Salvage/Pivot At Setpoint", salvagePivotPID.atSetpoint());
-        Logger.recordOutput(
-                "Salvage/Current Command",
-                this.getCurrentCommand() != null ? this.getCurrentCommand().getName() : "No Command");
+        salvageArm.updateTelemetry();
     }
 }

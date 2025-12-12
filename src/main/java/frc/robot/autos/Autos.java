@@ -13,9 +13,7 @@ public final class Autos {
 
     // Example autonomous routine: Drive forward and then turn
     public static Command driveAndTurn(Drive drivetrain, Time driveTime, Time turnTime) {
-        return
-                        AutoCommands.driveForward(drivetrain, driveTime)
-                .withName("Drive");
+        return AutoCommands.driveForward(drivetrain, driveTime).withName("Drive");
     }
 
     // Example autonomous routine: Pick up salvage and score it
