@@ -5,9 +5,9 @@ import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.Drive.Drive;
-import frc.robot.subsystems.Salvage.Salvage;
-import frc.robot.subsystems.Salvage.SalvageRoller;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.salvage.Salvage;
+import frc.robot.subsystems.salvage.SalvageRoller;
 
 public final class Autos {
 

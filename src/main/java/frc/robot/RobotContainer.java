@@ -21,11 +21,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.autos.Autos;
-import frc.robot.subsystems.Drive.Drive;
-import frc.robot.subsystems.Salvage.Salvage;
-import frc.robot.subsystems.Salvage.SalvageRoller;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.salvage.Salvage;
+import frc.robot.subsystems.salvage.SalvageRoller;
 import frc.robot.util.OILayer.OI;
-import frc.robot.util.OILayer.OIKeyboard;
 import frc.robot.util.OILayer.OIXbox;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -42,8 +41,7 @@ public class RobotContainer {
     private final SalvageRoller roller;
 
     // Controller
-    public final OI controller =
-            Constants.currentMode.equals(Constants.Mode.SIM) && Constants.useKeyboard ? new OIKeyboard() : new OIXbox();
+    public final OI controller = new OIXbox();
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
